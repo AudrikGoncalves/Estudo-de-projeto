@@ -1,0 +1,121 @@
+// Methodology steps data
+const STEPS_DATA = [
+  // ANÁLISE — USUÁRIO/USO
+  { id: 1, phase: 'analise', group: 'usuario', title: 'Tema', subtitle: 'Contexto histórico, funções e essência', icon: '◎', color: 'accent',
+    fields: ['Origem e contexto histórico do tema', 'Funções elementares, sociais e individuais', 'Essência — o que não pode faltar'],
+    tips: ['Não proponha soluções formais nesta etapa', 'Foque em compreender o tema antes de projetar'] },
+  { id: 2, phase: 'analise', group: 'usuario', title: 'Usuário', subtitle: 'Perfil do usuário e do cliente', icon: '◉', color: 'accent',
+    fields: ['Perfil dos usuários (idade, renda, hábitos)', 'Grupos distintos e suas particularidades', 'Objetivos e restrições do cliente', 'Orçamento disponível (faixa)'],
+    tips: ['Se cliente ≠ usuário, entrevistar ambos', 'Registrar divergências entre demandas'] },
+  { id: 3, phase: 'analise', group: 'usuario', title: 'Usos e Funções', subtitle: 'Funções que o espaço deve cumprir', icon: '◈', color: 'accent',
+    fields: ['Funções necessárias ao usuário', 'Funções exigidas pela legislação', 'Funções não-convencionais identificadas'],
+    tips: ['NÃO dimensione ou distribua espacialmente ainda'] },
+  { id: 4, phase: 'analise', group: 'usuario', title: 'Programa de Necessidades', subtitle: 'Elemento gerador da arquitetura', icon: '▦', color: 'accent',
+    fields: ['Lista de ambientes por entrevista', 'Ambientes exigidos por legislação', 'Ambientes identificados em estudos de caso', 'Programa confrontado e definitivo'],
+    tips: ['Confronte 3 fontes: entrevista, legislação, estudo de caso', 'Errar no programa = falhar no projeto'],
+    hasTool: 'programa' },
+  { id: 5, phase: 'analise', group: 'usuario', title: 'Setores', subtitle: 'Agrupamento de ambientes', icon: '⊞', color: 'accent',
+    fields: ['Setorização por legislação', 'Setorização por estudo de caso', 'Setorização por usos e funções'],
+    tips: ['Confronte as 3 fontes antes de definir'] },
+  { id: 6, phase: 'analise', group: 'usuario', title: 'Fluxos', subtitle: 'Movimentação entre setores', icon: '⇢', color: 'accent',
+    fields: ['Fluxos obrigatórios por norma', 'Fluxos cotidianos (serviço, social, íntimo)', 'Acessos distintos necessários'],
+    tips: ['Identifique fluxos que não devem se cruzar'] },
+  { id: 7, phase: 'analise', group: 'usuario', title: 'Funcionamento', subtitle: 'Operação da edificação', icon: '⟳', color: 'accent',
+    fields: ['Restrições de horário por lei', 'Funcionamento operacional (turnos, relações)', 'Lições de estudos de caso'],
+    tips: [] },
+  { id: 8, phase: 'analise', group: 'usuario', title: 'Pré-dimensionamento', subtitle: 'Áreas estimadas por ambiente', icon: '⊡', color: 'accent',
+    fields: ['Áreas mínimas por legislação/norma', 'Áreas praticadas em estudos de caso', 'Áreas por aferição do arquiteto'],
+    tips: ['Compare ao menos 2 projetos de referência'],
+    hasTool: 'predimensionamento' },
+  // ANÁLISE — LUGAR/TERRENO
+  { id: 9, phase: 'analise', group: 'terreno', title: 'Escolha do Terreno', subtitle: 'Viabilidade do terreno', icon: '⬒', color: 'green',
+    fields: ['Zoneamento e restrições de uso', 'Área total e área edificável', 'Impedimentos legais', 'Localização adequada'],
+    tips: ['Verifique ANTES de aprofundar a análise'] },
+  { id: 10, phase: 'analise', group: 'terreno', title: 'Forma e Dimensão', subtitle: 'Geometria do terreno', icon: '▱', color: 'green',
+    fields: ['Dimensões exatas (testada, profundidade)', 'Levantamento planialtimétrico', 'Ângulos e irregularidades'],
+    tips: [] },
+  { id: 11, phase: 'analise', group: 'terreno', title: 'Topografia', subtitle: 'Relevo e implicações', icon: '⏥', color: 'green',
+    fields: ['Declividade predominante e direção', 'Pontos de corte ou aterro', 'Oportunidade ou restrição?'],
+    tips: [] },
+  { id: 12, phase: 'analise', group: 'terreno', title: 'Sol e Ventos', subtitle: 'Incidência solar e ventilação', icon: '☀', color: 'green',
+    fields: ['Orientação de cada face (N/S/L/O)', 'Incidência solar por uso', 'Ventos dominantes e indesejáveis', 'Obstruções (edifícios, vegetação)'],
+    tips: [] },
+  { id: 13, phase: 'analise', group: 'terreno', title: 'Acessos', subtitle: 'Vias e pontos de entrada', icon: '⇥', color: 'green',
+    fields: ['Vias confrontantes e hierarquia', 'Acessos possíveis (veicular, pedestre, serviço)', 'Restrições de acesso'],
+    tips: [] },
+  { id: 14, phase: 'analise', group: 'terreno', title: 'Entorno', subtitle: 'Contexto imediato, local e regional', icon: '⊙', color: 'green',
+    fields: ['Entorno imediato (lindeiros, gabarito)', 'Entorno local (bairro, equipamentos)', 'Entorno regional (cidade, identidade)'],
+    tips: [] },
+  { id: 15, phase: 'analise', group: 'terreno', title: 'Legislação', subtitle: 'Parâmetros urbanísticos', icon: '§', color: 'green',
+    fields: ['Zoneamento e uso permitido', 'CA básico e máximo', 'TO máxima e TP mínima', 'Recuos (frente, fundos, laterais)', 'Gabarito máximo', 'Vagas exigidas', 'NBR 9050 e normas específicas'],
+    tips: ['Preencha TODOS os parâmetros'],
+    hasTool: 'legislacao' },
+  // SÍNTESE
+  { id: 16, phase: 'sintese', group: 'sintese', title: 'Hierarquização', subtitle: 'Priorizar problemas levantados', icon: '▲', color: 'blue',
+    fields: ['Problemas de GRANDE importância', 'Problemas de MÉDIA importância', 'Problemas de PEQUENA importância'],
+    tips: ['Cada projeto tem uma dificuldade particular', 'Considere fazer um stepback'],
+    hasTool: 'hierarquizacao' },
+  { id: 17, phase: 'sintese', group: 'sintese', title: 'Estudo de Caso', subtitle: 'Aprender com projetos análogos', icon: '◱', color: 'blue',
+    fields: ['Projetos analisados', 'Problemas análogos resolvidos', 'Convergências e divergências'],
+    tips: ['Estudo de caso ≠ referência estética', 'Busque projetos que resolveram seus problemas de GRANDE importância'] },
+  { id: 18, phase: 'sintese', group: 'sintese', title: 'Conceito', subtitle: 'Ideia central do projeto', icon: '◆', color: 'blue',
+    fields: ['Conceito proposto', 'Relação com problemas principais', 'Verificabilidade do conceito'],
+    tips: ['Conceito ≠ slogan, estilo ou imagem', 'Deve ser verificável ao final'] },
+  { id: 19, phase: 'sintese', group: 'sintese', title: 'Partido', subtitle: 'Diretrizes que materializam o conceito', icon: '◧', color: 'blue',
+    fields: ['Posição para cada problema de GRANDE importância', 'Manifestação na forma, implantação, materiais', 'Sistemas construtivos e relação com o lugar'],
+    tips: ['Partido ≠ escolha estética desvinculada'] },
+  { id: 20, phase: 'sintese', group: 'sintese', title: 'Decisões de Projeto', subtitle: 'Macro ao micro, em 3 categorias', icon: '✦', color: 'blue',
+    fields: ['Decisões de Ocupação', 'Decisões Construtivas', 'Decisões Plásticas'],
+    tips: ['NUNCA comece pelo micro antes do macro'] },
+  { id: 21, phase: 'sintese', group: 'sintese', title: 'Ideias Dominantes', subtitle: 'Decisões primordiais para o conceito', icon: '★', color: 'blue',
+    fields: ['Decisões destacadas como primordiais', 'Relação com o conceito'],
+    tips: ['Devem ser poucas e poderosas'] },
+  // AVALIAÇÃO
+  { id: 22, phase: 'avaliacao', group: 'avaliacao', title: 'Disposição dos Setores', subtitle: 'Múltiplas possibilidades no terreno', icon: '⊞', color: 'yellow',
+    fields: ['Opção 1 de disposição', 'Opção 2 de disposição', 'Opção 3 de disposição', 'Opção escolhida e justificativa'],
+    tips: ['Teste ao menos 3 disposições', 'Avalie contra problemas de GRANDE importância'] },
+  { id: 23, phase: 'avaliacao', group: 'avaliacao', title: 'Planta, Forma, Estrutura', subtitle: 'Resolução simultânea', icon: '⬡', color: 'yellow',
+    fields: ['Ideia de planta', 'Ideia de forma', 'Ideia de estrutura', 'Ideia de cobertura'],
+    tips: ['Planta, forma, estrutura e cobertura são INSEPARÁVEIS'] },
+  { id: 24, phase: 'avaliacao', group: 'avaliacao', title: 'Estudo Preliminar', subtitle: 'Consolidação das decisões', icon: '▣', color: 'yellow',
+    fields: ['Dimensionamento em escala', 'Definição estrutural', 'Plantas, cortes e fachadas EP'],
+    tips: ['Confrontar EP com problemas de GRANDE importância'] },
+  { id: 25, phase: 'avaliacao', group: 'avaliacao', title: 'Avaliação 3D', subtitle: 'Verificação tridimensional', icon: '⬢', color: 'yellow',
+    fields: ['Volumetria e proporções', 'Relação com terreno/entorno', 'Incidência solar', 'Coerência conceito × forma'],
+    tips: ['Maquete eletrônica = ferramenta de análise, não apresentação'] },
+];
+
+const PHASES = [
+  { id: 'analise', label: 'Análise', color: 'accent', groups: [
+    { id: 'usuario', label: 'Problemas do Usuário / Uso', steps: [1,2,3,4,5,6,7,8] },
+    { id: 'terreno', label: 'Problemas do Lugar / Terreno', steps: [9,10,11,12,13,14,15] }
+  ]},
+  { id: 'sintese', label: 'Síntese', color: 'blue', groups: [
+    { id: 'sintese', label: 'Síntese e Decisões', steps: [16,17,18,19,20,21] }
+  ]},
+  { id: 'avaliacao', label: 'Avaliação', color: 'yellow', groups: [
+    { id: 'avaliacao', label: 'Avaliação e Estudo Preliminar', steps: [22,23,24,25] }
+  ]},
+];
+
+const LEGISLACAO_FIELDS = [
+  { key: 'zoneamento', label: 'Zoneamento', placeholder: 'Ex: ZR-3' },
+  { key: 'uso', label: 'Uso permitido', placeholder: 'Residencial, Comercial...' },
+  { key: 'ca_basico', label: 'CA básico', placeholder: 'Ex: 1.0' },
+  { key: 'ca_maximo', label: 'CA máximo', placeholder: 'Ex: 2.5' },
+  { key: 'to_maxima', label: 'TO máxima (%)', placeholder: 'Ex: 50' },
+  { key: 'tp_minima', label: 'TP mínima (%)', placeholder: 'Ex: 25' },
+  { key: 'recuo_frente', label: 'Recuo de frente (m)', placeholder: 'Ex: 5' },
+  { key: 'recuo_fundos', label: 'Recuo de fundos (m)', placeholder: 'Ex: 3' },
+  { key: 'recuo_lat_dir', label: 'Recuo lateral direito (m)', placeholder: 'Ex: 1.5' },
+  { key: 'recuo_lat_esq', label: 'Recuo lateral esquerdo (m)', placeholder: 'Ex: 1.5' },
+  { key: 'gabarito', label: 'Gabarito máximo', placeholder: 'Ex: 4 pavimentos / 12m' },
+  { key: 'vagas', label: 'Vagas de estacionamento', placeholder: 'Ex: 1 vaga / 50m²' },
+  { key: 'acessibilidade', label: 'Acessibilidade (NBR 9050)', placeholder: 'Requisitos...' },
+  { key: 'normas_especificas', label: 'Normas específicas do uso', placeholder: 'Ex: Vigilância Sanitária...' },
+  { key: 'tombamento', label: 'Tombamentos / restrições patrimoniais', placeholder: '' },
+];
+
+window.STEPS_DATA = STEPS_DATA;
+window.PHASES = PHASES;
+window.LEGISLACAO_FIELDS = LEGISLACAO_FIELDS;

@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #FAF9F7;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #F3F1ED;
+  --bg-hover: #EDEAE4;
+  --text-primary: #1A1917;
+  --text-secondary: #6B6860;
+  --text-muted: #9C988E;
+  --border: #E5E2DB;
+  --border-light: #EEEBE5;
+  --accent: oklch(0.55 0.15 30);
+  --accent-light: oklch(0.92 0.04 30);
+  --accent-dark: oklch(0.45 0.15 30);
+  --green: oklch(0.55 0.12 155);
+  --green-light: oklch(0.92 0.04 155);
+  --yellow: oklch(0.7 0.12 85);
+  --yellow-light: oklch(0.94 0.04 85);
+  --red: oklch(0.55 0.15 25);
+  --red-light: oklch(0.92 0.05 25);
+  --blue: oklch(0.55 0.12 250);
+  --blue-light: oklch(0.92 0.04 250);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --font: 'DM Sans', -apple-system, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --transition: 180ms ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root { height: 100vh; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

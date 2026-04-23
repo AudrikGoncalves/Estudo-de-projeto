@@ -1,9 +1,21 @@
-// ─── Persistence ───
+// ─── Persistence (localStorage, Vercel-safe) ───
+// Migrate legacy key mp_projects → mp-projetos
+const STORAGE_KEY = 'mp-projetos';
+(function migrate() {
+  try {
+    const legacy = localStorage.getItem('mp_projects');
+    const current = localStorage.getItem(STORAGE_KEY);
+    if (legacy && !current) {
+      localStorage.setItem(STORAGE_KEY, legacy);
+    }
+  } catch {}
+})();
+
 const useProjectStore = () => {
   const [projects, setProjects] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem('mp_projects') || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
   });
-  const save = (p) => { setProjects(p); localStorage.setItem('mp_projects', JSON.stringify(p)); };
+  const save = (p) => { setProjects(p); localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); };
   return { projects, save };
 };
 

@@ -7,8 +7,35 @@ const App = () => {
   const [activeTool, setActiveTool] = React.useState(null);
   const [chatOpen, setChatOpen] = React.useState(false);
   const [projectData, setProjectData] = React.useState(() => currentProjectId ? loadProject(currentProjectId) : {});
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [saveStatus, setSaveStatus] = React.useState('saved'); // saved | saving | dirty
+  const saveTimerRef = React.useRef(null);
 
   const currentProject = projects.find(p => p.id === currentProjectId);
+
+  // Auto-save with debounce 800ms
+  const scheduleAutoSave = (data, projId) => {
+    setSaveStatus('saving');
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      if (projId) {
+        saveProject(projId, data);
+        // update project's updated timestamp
+        const updatedProjects = projects.map(p => p.id === projId ? { ...p, updated: Date.now() } : p);
+        saveProjects(updatedProjects);
+        setSaveStatus('saved');
+      }
+    }, 800);
+  };
+
+  // Warn on unsaved close
+  React.useEffect(() => {
+    const handler = (e) => {
+      if (saveStatus !== 'saved') { e.preventDefault(); e.returnValue = ''; }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [saveStatus]);
 
   const handleNavigate = (view, stepId, toolId) => {
     setCurrentView(view);
@@ -19,13 +46,16 @@ const App = () => {
 
   const handleCreateProject = (name) => {
     const id = 'p_' + Date.now();
-    const newProjects = [...projects, { id, name, created: Date.now() }];
+    const now = Date.now();
+    const newProj = { id, name, created: now, updated: now, status: 'Em andamento', cliente: '', anotacoes: '' };
+    const newProjects = [...projects, newProj];
     saveProjects(newProjects);
     saveProject(id, { completedSteps: [], stepNotes: {} });
     setCurrentProjectId(id);
     localStorage.setItem('mp_current', id);
     setProjectData({ completedSteps: [], stepNotes: {} });
     setCurrentView('dashboard');
+    setSaveStatus('saved');
   };
 
   const handleSelectProject = (id) => {
@@ -33,6 +63,7 @@ const App = () => {
     localStorage.setItem('mp_current', id);
     setProjectData(loadProject(id));
     setCurrentView('dashboard');
+    setSaveStatus('saved');
   };
 
   const handleDeleteProject = (id) => {
@@ -46,15 +77,53 @@ const App = () => {
     }
   };
 
+  const handleDuplicateProject = (id) => {
+    const src = projects.find(p => p.id === id);
+    if (!src) return;
+    const newId = 'p_' + Date.now();
+    const now = Date.now();
+    const newProj = { ...src, id: newId, name: src.name + ' (cópia)', created: now, updated: now };
+    saveProjects([...projects, newProj]);
+    const srcData = loadProject(id);
+    saveProject(newId, srcData);
+  };
+
   const handleSaveData = (newData) => {
     setProjectData(newData);
-    if (currentProjectId) saveProject(currentProjectId, newData);
+    if (currentProjectId) scheduleAutoSave(newData, currentProjectId);
+  };
+
+  const handleManualSave = () => {
+    if (!currentProjectId) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveProject(currentProjectId, projectData);
+    const updatedProjects = projects.map(p => p.id === currentProjectId ? { ...p, updated: Date.now() } : p);
+    saveProjects(updatedProjects);
+    setSaveStatus('saved');
+  };
+
+  const handleUpdateMeta = (meta) => {
+    if (!currentProjectId) return;
+    const updatedProjects = projects.map(p => p.id === currentProjectId ? { ...p, ...meta, updated: Date.now() } : p);
+    saveProjects(updatedProjects);
   };
 
   const handleGoHome = () => {
+    if (saveStatus !== 'saved' && !confirm('Há alterações não salvas. Deseja sair mesmo assim?')) return;
     setCurrentProjectId(null);
     localStorage.removeItem('mp_current');
     setCurrentView('home');
+  };
+
+  const handleExportPDF = async () => {
+    if (!currentProject) return;
+    try { await exportToPDF(currentProject, projectData); }
+    catch (e) { console.error(e); alert('Erro ao gerar PDF: ' + e.message); }
+  };
+  const handleExportMD = async () => {
+    if (!currentProject) return;
+    try { exportToMarkdown(currentProject, projectData); }
+    catch (e) { console.error(e); alert('Erro ao gerar Markdown: ' + e.message); }
   };
 
   const step = currentStep ? STEPS_DATA.find(s => s.id === currentStep) : null;
@@ -70,38 +139,63 @@ const App = () => {
           currentStep={currentStep}
         />
       )}
-      <main style={{ flex: 1, overflow: 'hidden' }}>
-        {currentView === 'home' && (
-          <HomeView
-            projects={projects}
-            onCreateProject={handleCreateProject}
-            onSelectProject={handleSelectProject}
-            onDeleteProject={handleDeleteProject}
-          />
-        )}
-        {currentView === 'dashboard' && (
-          <DashboardView
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {currentView !== 'home' && currentProject && (
+          <AppHeader
+            currentProject={currentProject}
+            saveStatus={saveStatus}
+            onOpenProjects={() => setDrawerOpen(true)}
+            onSave={handleManualSave}
+            onExportPDF={handleExportPDF}
+            onExportMD={handleExportMD}
             projectData={projectData}
-            projectName={currentProject?.name || ''}
-            onNavigate={handleNavigate}
+            onUpdateMeta={handleUpdateMeta}
           />
         )}
-        {currentView === 'step' && step && (
-          <StepView
-            step={step}
-            projectData={projectData}
-            onSave={handleSaveData}
-            onNavigate={handleNavigate}
-          />
-        )}
-        {currentView === 'tools' && (
-          <ToolsView
-            projectData={projectData}
-            onSave={handleSaveData}
-            activeTool={activeTool}
-          />
-        )}
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          {currentView === 'home' && (
+            <HomeView
+              projects={projects}
+              onCreateProject={handleCreateProject}
+              onSelectProject={handleSelectProject}
+              onDeleteProject={handleDeleteProject}
+            />
+          )}
+          {currentView === 'dashboard' && (
+            <DashboardView
+              projectData={projectData}
+              projectName={currentProject?.name || ''}
+              onNavigate={handleNavigate}
+            />
+          )}
+          {currentView === 'step' && step && (
+            <StepView
+              step={step}
+              projectData={projectData}
+              onSave={handleSaveData}
+              onNavigate={handleNavigate}
+            />
+          )}
+          {currentView === 'tools' && (
+            <ToolsView
+              projectData={projectData}
+              onSave={handleSaveData}
+              activeTool={activeTool}
+            />
+          )}
+        </div>
       </main>
+
+      <ProjectsDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        projects={projects}
+        currentId={currentProjectId}
+        onSelect={handleSelectProject}
+        onDelete={handleDeleteProject}
+        onDuplicate={handleDuplicateProject}
+        onNew={() => { const name = prompt('Nome do novo projeto:'); if (name?.trim()) handleCreateProject(name.trim()); }}
+      />
 
       {currentView !== 'home' && (
         <>

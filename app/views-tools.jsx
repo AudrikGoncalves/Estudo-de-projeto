@@ -13,7 +13,7 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
     { id: 'setorizacao', title: 'Setorização', desc: 'Organizar ambientes em setores', icon: '⊞', color: 'blue' },
     { id: 'fluxograma', title: 'Fluxograma', desc: 'Diagrama de fluxos estilo rede neural com conectores visuais', icon: '⇢', color: 'accent' },
     { id: 'diagrama', title: 'Diagrama de Setores', desc: 'Diagrama de bolhas com relações de proximidade', icon: '⊙', color: 'blue' },
-    { id: 'papeis', title: 'Estudo de Papéis', desc: 'Retângulos em escala real sobre o lote — áreas proporcionais', icon: '▣', color: 'yellow' },
+    { id: 'papeis', title: 'Estudo de Papéis', desc: 'Retângulos em escala sobre o lote — layout preliminar', icon: '▦', color: 'accent' },
   ];
 
   if (!activeTool) {

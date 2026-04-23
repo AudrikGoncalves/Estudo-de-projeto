@@ -1,6 +1,6 @@
 // ─── Diagrama de Setores (Bubble / Proximity Diagram) ───
 // Radius is strictly proportional: circle area = m² * SCALE
-const BUBBLE_SCALE = 100; // px² per m² — adjustable
+const BUBBLE_SCALE = 8; // px² per m² — adjustable
 
 const areaToRadius = (areaSqm) => Math.sqrt((areaSqm * BUBBLE_SCALE) / Math.PI);
 
@@ -36,7 +36,7 @@ const DiagramaSetoresTool = ({ data, onSave }) => {
   const [linking, setLinking] = React.useState(null);
 
   // Recalc radius when scale changes
-  const getRadius = (area) => Math.max(6, Math.sqrt((area * scale) / Math.PI));
+  const getRadius = (area) => Math.max(18, Math.sqrt((area * scale) / Math.PI));
 
   const importBubbles = () => {
     const setores = data.setores || [];
@@ -260,7 +260,7 @@ const DiagramaSetoresTool = ({ data, onSave }) => {
         <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
         <label style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
           Escala:
-          <input type="range" min="30" max="400" step="5" value={scale} onChange={e => setScale(Number(e.target.value))} style={{ width: 100 }} />
+          <input type="range" min="2" max="30" step="1" value={scale} onChange={e => setScale(Number(e.target.value))} style={{ width: 100 }} />
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11 }}>{scale}px²/m²</span>
         </label>
         {selected && <Button variant="ghost" onClick={() => removeBubble(selected)} style={{ fontSize: 12, color: 'var(--red)' }}>✕ Remover</Button>}

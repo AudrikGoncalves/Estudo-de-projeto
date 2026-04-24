@@ -18,10 +18,10 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
 
   if (!activeTool) {
     return (
-      <div style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100vh' }}>
+      <div data-tools-view style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 6 }}>Ferramentas</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 28 }}>Ferramentas interativas para auxiliar em cada etapa do processo projetual.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+        <div data-tools-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
           {tools.map(t => (
             <Card key={t.id} onClick={() => setActiveTool(t.id)} style={{ padding: 20, cursor: 'pointer', transition: 'var(--transition)', borderLeft: `3px solid var(--${t.color})` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -41,7 +41,7 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
   const toolTitle = tools.find(t => t.id === activeTool)?.title || '';
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100vh', paddingBottom: 80 }}>
+    <div data-tools-view style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%', paddingBottom: 80 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <Button variant="ghost" onClick={() => setActiveTool(null)}>← Ferramentas</Button>
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>{toolTitle}</h2>

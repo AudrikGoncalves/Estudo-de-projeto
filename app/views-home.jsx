@@ -11,7 +11,7 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject 
   };
 
   return (
-    <div style={{ padding: 48, maxWidth: 800, margin: '0 auto', animation: 'fadeIn 0.3s ease' }}>
+    <div data-home-view style={{ padding: 48, maxWidth: 800, margin: '0 auto', animation: 'fadeIn 0.3s ease', height: '100%', overflowY: 'auto' }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 700, letterSpacing: 2, margin: '0 auto 16px' }}>MP</div>
         <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>Metodologia de Projeto</h1>
@@ -68,7 +68,7 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject 
 
       <div style={{ marginTop: 48, padding: 24, background: 'var(--bg-sidebar)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-light)' }}>
         <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: 'var(--text-secondary)' }}>Sobre o Método</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <div data-home-phases-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
           {[
             { phase: 'Análise', desc: '15 etapas de levantamento — jamais resolver, apenas levantar.', color: 'accent', n: '01–15' },
             { phase: 'Síntese', desc: '6 etapas de conceituação, partido e decisões de projeto.', color: 'blue', n: '16–21' },
@@ -97,7 +97,7 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
   };
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.3s ease', overflowY: 'auto', height: '100vh' }}>
+    <div data-dashboard-view style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.3s ease', overflowY: 'auto', height: '100%' }}>
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>{projectName}</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Visão geral do progresso do projeto</p>
@@ -121,7 +121,7 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
       </Card>
 
       {/* Phase cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 28 }}>
+      <div data-dashboard-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 28 }}>
         {PHASES.map(phase => {
           const allSteps = phase.groups.flatMap(g => g.steps);
           const p = phaseProgress(allSteps);

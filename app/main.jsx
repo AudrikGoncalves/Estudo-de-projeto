@@ -8,6 +8,7 @@ const App = () => {
   const [chatOpen, setChatOpen] = React.useState(false);
   const [projectData, setProjectData] = React.useState(() => currentProjectId ? loadProject(currentProjectId) : {});
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [saveStatus, setSaveStatus] = React.useState('saved'); // saved | saving | dirty
   const saveTimerRef = React.useRef(null);
 
@@ -137,6 +138,8 @@ const App = () => {
           projectName={currentProject?.name || ''}
           completedSteps={projectData.completedSteps || []}
           currentStep={currentStep}
+          mobileOpen={mobileSidebarOpen}
+          onCloseMobile={() => setMobileSidebarOpen(false)}
         />
       )}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -150,6 +153,7 @@ const App = () => {
             onExportMD={handleExportMD}
             projectData={projectData}
             onUpdateMeta={handleUpdateMeta}
+            onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           />
         )}
         <div style={{ flex: 1, overflow: 'hidden' }}>

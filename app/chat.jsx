@@ -53,8 +53,8 @@ IMPORTANTE: Você é um guia de metodologia de projeto arquitetônico (Análise 
   if (!isOpen) return null;
 
   return (
-    <div style={chatStyles.overlay}>
-      <div style={chatStyles.panel}>
+    <div data-chat-overlay style={chatStyles.overlay}>
+      <div data-chat-panel style={chatStyles.panel}>
         <div style={chatStyles.header}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700 }}>AI</div>
@@ -116,7 +116,7 @@ const chatStyles = {
 
 // ─── Chat FAB ───
 const ChatFab = ({ onClick, hasChat }) => (
-  <button onClick={onClick} style={{
+  <button data-chat-fab onClick={onClick} style={{
     position: 'fixed', bottom: 20, right: 20, width: 52, height: 52, borderRadius: 14,
     background: 'var(--accent)', color: '#fff', border: 'none', fontSize: 22, fontWeight: 700,
     cursor: 'pointer', boxShadow: 'var(--shadow-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center',

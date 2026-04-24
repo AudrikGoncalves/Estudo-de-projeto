@@ -36,7 +36,7 @@ const StepView = ({ step, projectData, onSave, onNavigate }) => {
   const next = step.id < 25 ? STEPS_DATA.find(s => s.id === step.id + 1) : null;
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 820, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100vh', paddingBottom: 80 }}>
+    <div data-step-view style={{ padding: '32px 40px', maxWidth: 820, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%', paddingBottom: 80 }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
         <Badge label={step.phase === 'analise' ? 'Análise' : step.phase === 'sintese' ? 'Síntese' : 'Avaliação'} color={step.color} />

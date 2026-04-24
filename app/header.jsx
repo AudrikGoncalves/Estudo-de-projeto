@@ -1,5 +1,5 @@
 // ─── Header with project actions + auto-save indicator + exports ───
-const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExportPDF, onExportMD, projectData, onUpdateMeta }) => {
+const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExportPDF, onExportMD, projectData, onUpdateMeta, onOpenMobileSidebar }) => {
   const [saved, setSaved] = React.useState(false);
   const [exportingPdf, setExportingPdf] = React.useState(false);
   const [exportingMd, setExportingMd] = React.useState(false);
@@ -31,44 +31,50 @@ const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExpor
   };
 
   return (
-    <div style={headerStyles.root}>
-      <div style={headerStyles.left}>
-        <button style={headerStyles.iconBtn} onClick={onOpenProjects} title="Meus projetos">
-          <span style={{ fontSize: 16 }}>📁</span>
-          <span style={{ fontSize: 12, fontWeight: 600 }}>Projetos</span>
+    <div data-app-header style={headerStyles.root}>
+      <div data-header-left style={headerStyles.left}>
+        <button
+          data-hamburger
+          onClick={onOpenMobileSidebar}
+          title="Abrir menu"
+          aria-label="Abrir menu"
+        >☰</button>
+        <button data-header-btn style={headerStyles.iconBtn} onClick={onOpenProjects} title="Meus projetos">
+          <span data-header-btn-icon style={{ fontSize: 16 }}>📁</span>
+          <span data-header-btn-label style={{ fontSize: 12, fontWeight: 600 }}>Projetos</span>
         </button>
-        <div style={{ width: 1, height: 24, background: 'var(--border)' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 280 }}>
+        <div data-header-divider style={{ width: 1, height: 24, background: 'var(--border)' }} />
+        <div data-header-project-meta style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+          <div data-header-project-name style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 280 }}>
             {currentProject.name}
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
+          <div data-header-project-sub style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
             {currentProject.cliente && <span>• {currentProject.cliente}</span>}
             <button onClick={() => setEditingMeta(true)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11, padding: 0, textDecoration: 'underline' }}>editar</button>
           </div>
         </div>
-        <span style={{ ...headerStyles.statusBadge, background: sc.bg, color: sc.fg }}>
+        <span data-header-status-badge style={{ ...headerStyles.statusBadge, background: sc.bg, color: sc.fg }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.fg }} />
           {status}
         </span>
       </div>
 
-      <div style={headerStyles.right}>
-        <span style={{ fontSize: 11, color: saveStatus === 'saved' ? 'var(--green)' : saveStatus === 'saving' ? 'var(--text-muted)' : 'var(--yellow)', display: 'flex', alignItems: 'center', gap: 5 }}>
+      <div data-header-right style={headerStyles.right}>
+        <span data-header-status-label style={{ fontSize: 11, color: saveStatus === 'saved' ? 'var(--green)' : saveStatus === 'saving' ? 'var(--text-muted)' : 'var(--yellow)', display: 'flex', alignItems: 'center', gap: 5 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: saveStatus === 'saved' ? 'var(--green)' : saveStatus === 'saving' ? 'var(--text-muted)' : 'var(--yellow)', animation: saveStatus === 'saving' ? 'pulse 1s infinite' : 'none' }} />
           {saveStatus === 'saved' ? 'Salvo' : saveStatus === 'saving' ? 'Salvando...' : 'Não salvo'}
         </span>
-        <button style={headerStyles.iconBtn} onClick={handleSave} title="Salvar agora">
-          <span style={{ fontSize: 14 }}>{saved ? '✓' : '💾'}</span>
-          <span style={{ fontSize: 12 }}>{saved ? 'Salvo!' : 'Salvar'}</span>
+        <button data-header-btn style={headerStyles.iconBtn} onClick={handleSave} title="Salvar agora">
+          <span data-header-btn-icon style={{ fontSize: 14 }}>{saved ? '✓' : '💾'}</span>
+          <span data-header-btn-label style={{ fontSize: 12 }}>{saved ? 'Salvo!' : 'Salvar'}</span>
         </button>
-        <button style={headerStyles.iconBtn} onClick={handlePdf} title="Exportar PDF" disabled={exportingPdf}>
-          <span style={{ fontSize: 14 }}>{exportingPdf ? '⏳' : '📄'}</span>
-          <span style={{ fontSize: 12 }}>{exportingPdf ? 'Gerando...' : 'PDF'}</span>
+        <button data-header-btn style={headerStyles.iconBtn} onClick={handlePdf} title="Exportar PDF" disabled={exportingPdf}>
+          <span data-header-btn-icon style={{ fontSize: 14 }}>{exportingPdf ? '⏳' : '📄'}</span>
+          <span data-header-btn-label style={{ fontSize: 12 }}>{exportingPdf ? 'Gerando...' : 'PDF'}</span>
         </button>
-        <button style={headerStyles.iconBtn} onClick={handleMd} title="Pronto para importar no Obsidian" disabled={exportingMd}>
-          <span style={{ fontSize: 14 }}>{exportingMd ? '⏳' : '🔷'}</span>
-          <span style={{ fontSize: 12 }}>{exportingMd ? '...' : 'Obsidian'}</span>
+        <button data-header-btn style={headerStyles.iconBtn} onClick={handleMd} title="Pronto para importar no Obsidian" disabled={exportingMd}>
+          <span data-header-btn-icon style={{ fontSize: 14 }}>{exportingMd ? '⏳' : '🔷'}</span>
+          <span data-header-btn-label style={{ fontSize: 12 }}>{exportingMd ? '...' : 'Obsidian'}</span>
         </button>
       </div>
 
@@ -121,7 +127,7 @@ const ProjectsDrawer = ({ isOpen, onClose, projects, currentId, onSelect, onDele
   return (
     <>
       <div style={{ ...drawerStyles.backdrop, opacity: isOpen ? 1 : 0, pointerEvents: isOpen ? 'auto' : 'none' }} onClick={onClose} />
-      <div style={{ ...drawerStyles.drawer, transform: isOpen ? 'translateX(0)' : 'translateX(-100%)' }}>
+      <div data-projects-drawer style={{ ...drawerStyles.drawer, transform: isOpen ? 'translateX(0)' : 'translateX(-100%)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 20px 12px' }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700 }}>Meus Projetos</div>

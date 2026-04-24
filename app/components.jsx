@@ -27,24 +27,45 @@ const saveProject = (id, data) => {
 };
 
 // ─── Sidebar ───
-const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, currentStep }) => {
+const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, currentStep, mobileOpen, onCloseMobile }) => {
   const [expanded, setExpanded] = React.useState({ analise: true, sintese: false, avaliacao: false });
 
   const toggle = (id) => setExpanded(p => ({ ...p, [id]: !p[id] }));
 
   const progress = Math.round((completedSteps.length / 25) * 100);
 
+  const handleNavClick = (view, stepId, toolId) => {
+    onNavigate(view, stepId, toolId);
+    if (onCloseMobile) onCloseMobile();
+  };
+
   return (
-    <div style={sidebarStyles.root}>
+    <>
+      <div
+        data-sidebar-backdrop
+        data-mobile-open={mobileOpen ? 'true' : 'false'}
+        onClick={onCloseMobile}
+      />
+    <div data-sidebar data-mobile-open={mobileOpen ? 'true' : 'false'} style={sidebarStyles.root}>
       <div style={sidebarStyles.logo}>
         <div style={sidebarStyles.logoIcon}>MP</div>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={sidebarStyles.logoTitle}>Metodologia</div>
           <div style={sidebarStyles.logoSub}>de Projeto</div>
         </div>
+        <button
+          onClick={onCloseMobile}
+          aria-label="Fechar menu"
+          style={{
+            display: 'none', background: 'none', border: 'none',
+            fontSize: 22, color: 'var(--text-muted)', cursor: 'pointer',
+            padding: 4, marginRight: -4,
+          }}
+          className="sidebar-close-btn"
+        >×</button>
       </div>
 
-      <div style={sidebarStyles.projectBadge} onClick={() => onNavigate('home')}>
+      <div style={sidebarStyles.projectBadge} onClick={() => handleNavClick('home')}>
         <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Projeto atual</span>
         <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{projectName || 'Sem projeto'}</span>
       </div>
@@ -62,8 +83,8 @@ const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, current
           </div>
 
           <nav style={sidebarStyles.nav}>
-            <SidebarItem icon="⊞" label="Visão Geral" active={currentView === 'dashboard'} onClick={() => onNavigate('dashboard')} />
-            <SidebarItem icon="⚙" label="Ferramentas" active={currentView === 'tools'} onClick={() => onNavigate('tools')} />
+            <SidebarItem icon="⊞" label="Visão Geral" active={currentView === 'dashboard'} onClick={() => handleNavClick('dashboard')} />
+            <SidebarItem icon="⚙" label="Ferramentas" active={currentView === 'tools'} onClick={() => handleNavClick('tools')} />
 
             <div style={sidebarStyles.divider} />
             <div style={sidebarStyles.sectionLabel}>ETAPAS</div>
@@ -85,7 +106,7 @@ const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, current
                       const active = currentStep === sId && currentView === 'step';
                       return (
                         <div key={sId} style={{ ...sidebarStyles.stepItem, ...(active ? sidebarStyles.stepActive : {}), ...(done ? { opacity: 0.7 } : {}) }}
-                          onClick={() => onNavigate('step', sId)}>
+                          onClick={() => handleNavClick('step', sId)}>
                           <span style={{ ...sidebarStyles.stepDot, background: done ? `var(--${s.color})` : 'var(--border)', color: done ? '#fff' : 'var(--text-muted)', fontSize: done ? 9 : 10 }}>
                             {done ? '✓' : sId}
                           </span>
@@ -101,6 +122,7 @@ const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, current
         </>
       )}
     </div>
+    </>
   );
 };
 

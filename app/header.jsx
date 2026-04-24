@@ -188,26 +188,62 @@ const ProjectsDrawer = ({ isOpen, onClose, projects, currentId, onSelect, onDele
 };
 
 const headerStyles = {
-  root: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 20px', background: 'var(--bg-card)', borderBottom: '1px solid var(--border-light)', gap: 12, flexShrink: 0, zIndex: 50 },
+  root: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 24px',
+    background: 'color-mix(in oklab, var(--bg-elevated) 82%, transparent)',
+    backdropFilter: 'saturate(180%) blur(14px)',
+    WebkitBackdropFilter: 'saturate(180%) blur(14px)',
+    borderBottom: '1px solid var(--border-light)',
+    gap: 14,
+    flexShrink: 0,
+    zIndex: 50,
+  },
   left: { display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 },
   right: { display: 'flex', alignItems: 'center', gap: 8 },
-  iconBtn: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'var(--font)', transition: 'var(--transition)' },
-  statusBadge: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 20 },
+  iconBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    padding: '9px 14px',
+    borderRadius: 'var(--radius)',
+    border: '1px solid var(--border)',
+    background: 'var(--bg-elevated)',
+    color: 'var(--text-primary)',
+    cursor: 'pointer',
+    fontFamily: 'var(--font)',
+    fontWeight: 500,
+    letterSpacing: '-0.005em',
+    transition: 'var(--transition)',
+    boxShadow: 'var(--shadow-xs)',
+  },
+  statusBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    fontSize: 11,
+    fontWeight: 600,
+    padding: '5px 12px',
+    borderRadius: 999,
+    letterSpacing: '-0.005em',
+  },
 };
 
 const drawerStyles = {
-  backdrop: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', transition: 'opacity 0.25s', zIndex: 99 },
-  drawer: { position: 'fixed', top: 0, left: 0, bottom: 0, width: 360, maxWidth: '90vw', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border)', transition: 'transform 0.3s cubic-bezier(0.2,0.8,0.2,1)', display: 'flex', flexDirection: 'column', zIndex: 100, boxShadow: '4px 0 20px rgba(0,0,0,0.1)' },
-  empty: { textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' },
-  projCard: { padding: 12, borderRadius: 'var(--radius)', border: '1px solid', marginBottom: 8, transition: 'var(--transition)' },
-  smallBtn: { padding: '5px 10px', fontSize: 11, fontWeight: 600, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font)' },
+  backdrop: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', transition: 'opacity 0.25s', zIndex: 99 },
+  drawer: { position: 'fixed', top: 0, left: 0, bottom: 0, width: 380, maxWidth: '90vw', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-light)', transition: 'transform 0.32s cubic-bezier(0.2,0.8,0.2,1)', display: 'flex', flexDirection: 'column', zIndex: 100, boxShadow: '8px 0 40px rgba(0,0,0,0.15)' },
+  empty: { textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)' },
+  projCard: { padding: 14, borderRadius: 'var(--radius)', border: '1px solid', marginBottom: 10, transition: 'var(--transition)', boxShadow: 'var(--shadow-xs)' },
+  smallBtn: { padding: '6px 12px', fontSize: 12, fontWeight: 600, borderRadius: 'var(--radius-xs)', border: '1px solid var(--border)', background: 'var(--bg-elevated)', color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'var(--font)', transition: 'var(--transition)' },
 };
 
 const modalStyles = {
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, animation: 'fadeIn 0.2s' },
-  body: { background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: 24, width: 460, maxWidth: '92vw', boxShadow: 'var(--shadow-lg)', animation: 'slideUp 0.25s' },
+  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, animation: 'fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1)' },
+  body: { background: 'var(--bg-elevated)', borderRadius: 'var(--radius-xl)', padding: 28, width: 480, maxWidth: '92vw', boxShadow: 'var(--shadow-xl)', animation: 'scaleIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)', border: '1px solid var(--border-light)' },
 };
-const mLabel = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginTop: 14, marginBottom: 6 };
+const mLabel = { display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginTop: 16, marginBottom: 8, letterSpacing: '-0.005em' };
 
 window.AppHeader = AppHeader;
 window.ProjectsDrawer = ProjectsDrawer;

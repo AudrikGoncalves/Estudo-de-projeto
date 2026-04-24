@@ -140,12 +140,25 @@ const AuthScreen = ({ onSkip, onAuthed }) => {
     } finally { setBusy(false); }
   };
 
+  const [currentTheme, setCurrentTheme] = React.useState(() => document.documentElement.getAttribute('data-theme') || 'light');
+  const toggleT = () => {
+    const next = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('mp_theme', next);
+    setCurrentTheme(next);
+  };
+
   return (
     <div style={{
       position: 'fixed', inset: 0, background: 'var(--bg)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       zIndex: 500, padding: 20, animation: 'fadeIn 0.3s ease',
     }}>
+      <div style={{ position: 'absolute', top: 'calc(16px + env(safe-area-inset-top))', right: 16 }}>
+        <button data-theme-toggle onClick={toggleT} aria-label="Alternar tema">
+          {currentTheme === 'dark' ? '☀' : '☾'}
+        </button>
+      </div>
       <div style={{
         width: '100%', maxWidth: 400, background: 'var(--bg-card)',
         border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)',
@@ -281,6 +294,37 @@ const AccountBadge = ({ session, onSignOut, onShowAuth }) => {
     </div>
   );
 };
+
+// ─── Theme (light/dark) ───
+const getInitialTheme = () => {
+  const saved = localStorage.getItem('mp_theme');
+  if (saved === 'light' || saved === 'dark') return saved;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+const useTheme = () => {
+  const [theme, setTheme] = React.useState(getInitialTheme);
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('mp_theme', theme);
+  }, [theme]);
+  const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
+  return { theme, toggle };
+};
+
+const ThemeToggle = ({ theme, onToggle }) => (
+  <button
+    data-theme-toggle
+    onClick={onToggle}
+    title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+    aria-label="Alternar tema"
+  >
+    {theme === 'dark' ? '☀' : '☾'}
+  </button>
+);
+
+window.useTheme = useTheme;
+window.ThemeToggle = ThemeToggle;
 
 window.supabaseClient = supabaseClient;
 window.useAuth = useAuth;

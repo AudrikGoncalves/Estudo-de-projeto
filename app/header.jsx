@@ -1,5 +1,5 @@
 // ─── Header with project actions + auto-save indicator + exports ───
-const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExportPDF, onExportMD, projectData, onUpdateMeta, onOpenMobileSidebar, session, onSignOut, onShowAuth, syncing }) => {
+const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExportPDF, onExportMD, projectData, onUpdateMeta, onOpenMobileSidebar, session, onSignOut, onShowAuth, syncing, theme, onToggleTheme }) => {
   const [saved, setSaved] = React.useState(false);
   const [exportingPdf, setExportingPdf] = React.useState(false);
   const [exportingMd, setExportingMd] = React.useState(false);
@@ -82,6 +82,7 @@ const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExpor
             <span data-header-btn-label>Sync</span>
           </span>
         )}
+        {onToggleTheme && <ThemeToggle theme={theme} onToggle={onToggleTheme} />}
         {session !== undefined && (
           <AccountBadge session={session} onSignOut={onSignOut} onShowAuth={onShowAuth} />
         )}

@@ -1,6 +1,7 @@
 // ─── Main App ───
 const App = () => {
   const { session, loading: authLoading, signOut } = useAuth();
+  const { theme, toggle: toggleTheme } = useTheme();
   const { projects, save: saveProjects, setProjects } = useProjectStore();
   const [showAuth, setShowAuth] = React.useState(() => !localStorage.getItem('mp_auth_skipped') && !localStorage.getItem('mp-auth'));
   const [syncing, setSyncing] = React.useState(false);
@@ -8,7 +9,6 @@ const App = () => {
   const [currentView, setCurrentView] = React.useState(currentProjectId ? 'dashboard' : 'home');
   const [currentStep, setCurrentStep] = React.useState(null);
   const [activeTool, setActiveTool] = React.useState(null);
-  const [chatOpen, setChatOpen] = React.useState(false);
   const [projectData, setProjectData] = React.useState(() => currentProjectId ? loadProject(currentProjectId) : {});
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
@@ -202,10 +202,13 @@ const App = () => {
             onSignOut={async () => { await signOut(); localStorage.removeItem('mp_auth_skipped'); setShowAuth(true); }}
             onShowAuth={() => setShowAuth(true)}
             syncing={syncing}
+            theme={theme}
+            onToggleTheme={toggleTheme}
           />
         )}
         {currentView === 'home' && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 20px 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 20px 0' }}>
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
             <AccountBadge
               session={session}
               onSignOut={async () => { await signOut(); localStorage.removeItem('mp_auth_skipped'); setShowAuth(true); }}
@@ -258,12 +261,6 @@ const App = () => {
         onNew={() => { const name = prompt('Nome do novo projeto:'); if (name?.trim()) handleCreateProject(name.trim()); }}
       />
 
-      {currentView !== 'home' && (
-        <>
-          <ChatFab onClick={() => setChatOpen(!chatOpen)} hasChat={chatOpen} />
-          <ChatPanel projectData={projectData} isOpen={chatOpen} onClose={() => setChatOpen(false)} />
-        </>
-      )}
     </div>
   );
 };

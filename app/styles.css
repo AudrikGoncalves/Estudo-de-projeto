@@ -4,7 +4,7 @@
 @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-:root {
+:root, [data-theme="light"] {
   --bg: #FAF9F7;
   --bg-card: #FFFFFF;
   --bg-sidebar: #F3F1ED;
@@ -34,6 +34,34 @@
   --font: 'DM Sans', -apple-system, sans-serif;
   --font-mono: 'DM Mono', monospace;
   --transition: 180ms ease;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #141311;
+  --bg-card: #1E1D1A;
+  --bg-sidebar: #1A1917;
+  --bg-hover: #2A2824;
+  --text-primary: #F5F3EE;
+  --text-secondary: #B8B3A8;
+  --text-muted: #807B72;
+  --border: #333028;
+  --border-light: #2A2824;
+  --accent: oklch(0.7 0.14 30);
+  --accent-light: oklch(0.3 0.08 30);
+  --accent-dark: oklch(0.6 0.14 30);
+  --green: oklch(0.7 0.12 155);
+  --green-light: oklch(0.28 0.05 155);
+  --yellow: oklch(0.78 0.12 85);
+  --yellow-light: oklch(0.3 0.06 85);
+  --red: oklch(0.7 0.14 25);
+  --red-light: oklch(0.3 0.08 25);
+  --blue: oklch(0.7 0.12 250);
+  --blue-light: oklch(0.3 0.06 250);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+  color-scheme: dark;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,9 +77,10 @@ body {
   height: 100dvh;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
-#root { height: 100vh; height: 100dvh; }
+#root { height: 100vh; height: 100dvh; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); box-sizing: border-box; }
 
 button, [role="button"] { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
@@ -68,6 +97,33 @@ input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
+/* ─── Card / button hovers usam --bg-hover ─── */
+[data-theme="dark"] button:hover:not(:disabled),
+[data-theme="dark"] [role="button"]:hover { filter: brightness(1.12); }
+
+/* Scrollbar dark */
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #3A3834; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #4A4740; }
+
+/* Theme toggle button */
+[data-theme-toggle] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+[data-theme-toggle]:hover { background: var(--bg-hover); }
+
 /* ─── Mobile hamburger (só aparece em telas pequenas) ─── */
 [data-hamburger] { display: none; }
 [data-sidebar-backdrop] { display: none; }
@@ -79,18 +135,18 @@ input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text-primary);
     cursor: pointer;
-    font-size: 20px;
+    font-size: 22px;
     padding: 0;
-    margin-right: 4px;
     flex-shrink: 0;
   }
+  [data-hamburger]:active { background: var(--bg-hover); transform: scale(0.96); }
 
   /* Sidebar vira drawer */
   [data-sidebar] {
@@ -104,7 +160,9 @@ input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
     z-index: 150;
     transform: translateX(-100%);
     transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.22);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   [data-sidebar][data-mobile-open="true"] {
     transform: translateX(0);
@@ -128,16 +186,17 @@ input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
 
   /* Header compacto */
   [data-app-header] {
-    padding: 8px 10px !important;
-    gap: 6px !important;
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    padding-top: calc(10px + env(safe-area-inset-top)) !important;
   }
   [data-app-header] [data-header-left] {
-    gap: 8px !important;
+    gap: 10px !important;
     flex: 1;
     min-width: 0;
   }
   [data-app-header] [data-header-right] {
-    gap: 4px !important;
+    gap: 6px !important;
   }
   [data-app-header] [data-header-divider] {
     display: none !important;
@@ -148,24 +207,42 @@ input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
   [data-app-header] [data-header-status-badge] {
     display: none !important;
   }
+  [data-app-header] [data-header-project-sub] {
+    display: none !important;
+  }
   [data-app-header] [data-header-project-meta] {
     max-width: none !important;
+    gap: 0 !important;
   }
   [data-app-header] [data-header-project-name] {
-    max-width: 140px !important;
-    font-size: 13px !important;
+    max-width: 120px !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
   }
   [data-app-header] [data-header-btn] {
-    padding: 8px 10px !important;
-    min-width: 40px;
-    min-height: 40px;
+    padding: 0 !important;
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
     justify-content: center;
+    border-radius: 10px !important;
+  }
+  [data-app-header] [data-header-btn]:active {
+    background: var(--bg-hover) !important;
+    transform: scale(0.95);
   }
   [data-app-header] [data-header-btn-label] {
     display: none !important;
   }
   [data-app-header] [data-header-btn-icon] {
-    font-size: 16px !important;
+    font-size: 17px !important;
+  }
+
+  /* Theme toggle no mobile um pouquinho maior */
+  [data-theme-toggle] {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 17px !important;
   }
 
   /* Chat vira tela cheia */
@@ -195,8 +272,23 @@ input, textarea, select { font-size: 16px; } /* previne zoom no iOS */
 
   /* Home view + cards ocupam mais espaço */
   [data-home-view] {
-    padding: 24px 18px !important;
+    padding: 20px 16px !important;
+    padding-top: calc(14px + env(safe-area-inset-top)) !important;
   }
+  [data-home-view] h1 { font-size: 22px !important; }
+  [data-home-view] h2 { font-size: 16px !important; }
+
+  /* Botões maiores no mobile (touch ≥ 44px) */
+  button { min-height: 36px; }
+
+  /* Inputs e textareas com padding maior */
+  input:not([data-theme-toggle]), textarea, select {
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Cards um pouco mais compactos */
+  [data-home-view] > div { gap: 12px; }
 
   /* Dashboard + home phases responsivos */
   [data-dashboard-grid],

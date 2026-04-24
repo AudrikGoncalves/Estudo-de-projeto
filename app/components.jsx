@@ -12,11 +12,12 @@ const STORAGE_KEY = 'mp-projetos';
 })();
 
 const useProjectStore = () => {
-  const [projects, setProjects] = React.useState(() => {
+  const [projects, setProjectsState] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
   });
-  const save = (p) => { setProjects(p); localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); };
-  return { projects, save };
+  const save = (p) => { setProjectsState(p); localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); };
+  const setProjects = (p) => { setProjectsState(p); localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); };
+  return { projects, save, setProjects };
 };
 
 const loadProject = (id) => {

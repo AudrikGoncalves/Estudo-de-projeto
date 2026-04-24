@@ -1,6 +1,9 @@
 // ─── Main App ───
 const App = () => {
-  const { projects, save: saveProjects } = useProjectStore();
+  const { session, loading: authLoading, signOut } = useAuth();
+  const { projects, save: saveProjects, setProjects } = useProjectStore();
+  const [showAuth, setShowAuth] = React.useState(() => !localStorage.getItem('mp_auth_skipped') && !localStorage.getItem('mp-auth'));
+  const [syncing, setSyncing] = React.useState(false);
   const [currentProjectId, setCurrentProjectId] = React.useState(() => localStorage.getItem('mp_current') || null);
   const [currentView, setCurrentView] = React.useState(currentProjectId ? 'dashboard' : 'home');
   const [currentStep, setCurrentStep] = React.useState(null);
@@ -13,17 +16,31 @@ const App = () => {
   const saveTimerRef = React.useRef(null);
 
   const currentProject = projects.find(p => p.id === currentProjectId);
+  const userId = session?.user?.id;
+
+  // Ao autenticar, puxa/sincroniza projetos da nuvem
+  React.useEffect(() => {
+    if (!userId) return;
+    setSyncing(true);
+    cloudSyncOnLogin(userId).then((merged) => {
+      if (merged) setProjects(merged);
+    }).finally(() => setSyncing(false));
+  }, [userId]);
 
   // Auto-save with debounce 800ms
   const scheduleAutoSave = (data, projId) => {
     setSaveStatus('saving');
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => {
+    saveTimerRef.current = setTimeout(async () => {
       if (projId) {
         saveProject(projId, data);
-        // update project's updated timestamp
-        const updatedProjects = projects.map(p => p.id === projId ? { ...p, updated: Date.now() } : p);
+        const now = Date.now();
+        const updatedProjects = projects.map(p => p.id === projId ? { ...p, updated: now } : p);
         saveProjects(updatedProjects);
+        if (userId) {
+          const proj = updatedProjects.find(p => p.id === projId);
+          if (proj) { try { await cloudUpsertProject(userId, proj, data); } catch (e) { console.warn('cloud save fail', e); } }
+        }
         setSaveStatus('saved');
       }
     }, 800);
@@ -45,18 +62,20 @@ const App = () => {
     else if (view !== 'tools') setActiveTool(null);
   };
 
-  const handleCreateProject = (name) => {
+  const handleCreateProject = async (name) => {
     const id = 'p_' + Date.now();
     const now = Date.now();
     const newProj = { id, name, created: now, updated: now, status: 'Em andamento', cliente: '', anotacoes: '' };
     const newProjects = [...projects, newProj];
     saveProjects(newProjects);
-    saveProject(id, { completedSteps: [], stepNotes: {} });
+    const initialData = { completedSteps: [], stepNotes: {} };
+    saveProject(id, initialData);
     setCurrentProjectId(id);
     localStorage.setItem('mp_current', id);
-    setProjectData({ completedSteps: [], stepNotes: {} });
+    setProjectData(initialData);
     setCurrentView('dashboard');
     setSaveStatus('saved');
+    if (userId) { try { await cloudUpsertProject(userId, newProj, initialData); } catch (e) { console.warn('cloud create fail', e); } }
   };
 
   const handleSelectProject = (id) => {
@@ -67,7 +86,7 @@ const App = () => {
     setSaveStatus('saved');
   };
 
-  const handleDeleteProject = (id) => {
+  const handleDeleteProject = async (id) => {
     if (!confirm('Excluir este projeto?')) return;
     saveProjects(projects.filter(p => p.id !== id));
     localStorage.removeItem(`mp_proj_${id}`);
@@ -76,9 +95,10 @@ const App = () => {
       localStorage.removeItem('mp_current');
       setCurrentView('home');
     }
+    if (userId) { try { await cloudDeleteProject(userId, id); } catch (e) { console.warn('cloud delete fail', e); } }
   };
 
-  const handleDuplicateProject = (id) => {
+  const handleDuplicateProject = async (id) => {
     const src = projects.find(p => p.id === id);
     if (!src) return;
     const newId = 'p_' + Date.now();
@@ -87,6 +107,7 @@ const App = () => {
     saveProjects([...projects, newProj]);
     const srcData = loadProject(id);
     saveProject(newId, srcData);
+    if (userId) { try { await cloudUpsertProject(userId, newProj, srcData); } catch (e) { console.warn('cloud dup fail', e); } }
   };
 
   const handleSaveData = (newData) => {
@@ -94,19 +115,29 @@ const App = () => {
     if (currentProjectId) scheduleAutoSave(newData, currentProjectId);
   };
 
-  const handleManualSave = () => {
+  const handleManualSave = async () => {
     if (!currentProjectId) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveProject(currentProjectId, projectData);
-    const updatedProjects = projects.map(p => p.id === currentProjectId ? { ...p, updated: Date.now() } : p);
+    const now = Date.now();
+    const updatedProjects = projects.map(p => p.id === currentProjectId ? { ...p, updated: now } : p);
     saveProjects(updatedProjects);
+    if (userId) {
+      const proj = updatedProjects.find(p => p.id === currentProjectId);
+      if (proj) { try { await cloudUpsertProject(userId, proj, projectData); } catch (e) { console.warn('cloud manual save fail', e); } }
+    }
     setSaveStatus('saved');
   };
 
-  const handleUpdateMeta = (meta) => {
+  const handleUpdateMeta = async (meta) => {
     if (!currentProjectId) return;
-    const updatedProjects = projects.map(p => p.id === currentProjectId ? { ...p, ...meta, updated: Date.now() } : p);
+    const now = Date.now();
+    const updatedProjects = projects.map(p => p.id === currentProjectId ? { ...p, ...meta, updated: now } : p);
     saveProjects(updatedProjects);
+    if (userId) {
+      const proj = updatedProjects.find(p => p.id === currentProjectId);
+      if (proj) { try { await cloudUpsertProject(userId, proj, projectData); } catch (e) { console.warn('cloud meta fail', e); } }
+    }
   };
 
   const handleGoHome = () => {
@@ -128,6 +159,19 @@ const App = () => {
   };
 
   const step = currentStep ? STEPS_DATA.find(s => s.id === currentStep) : null;
+
+  if (authLoading) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)', fontSize: 14 }}>Carregando...</div>;
+  }
+
+  if (showAuth && !session) {
+    return (
+      <AuthScreen
+        onSkip={() => { localStorage.setItem('mp_auth_skipped', '1'); setShowAuth(false); }}
+        onAuthed={() => { localStorage.removeItem('mp_auth_skipped'); setShowAuth(false); }}
+      />
+    );
+  }
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -154,7 +198,20 @@ const App = () => {
             projectData={projectData}
             onUpdateMeta={handleUpdateMeta}
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+            session={session}
+            onSignOut={async () => { await signOut(); localStorage.removeItem('mp_auth_skipped'); setShowAuth(true); }}
+            onShowAuth={() => setShowAuth(true)}
+            syncing={syncing}
           />
+        )}
+        {currentView === 'home' && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 20px 0' }}>
+            <AccountBadge
+              session={session}
+              onSignOut={async () => { await signOut(); localStorage.removeItem('mp_auth_skipped'); setShowAuth(true); }}
+              onShowAuth={() => setShowAuth(true)}
+            />
+          </div>
         )}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {currentView === 'home' && (

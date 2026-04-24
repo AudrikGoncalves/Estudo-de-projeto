@@ -1,5 +1,5 @@
 // ─── Header with project actions + auto-save indicator + exports ───
-const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExportPDF, onExportMD, projectData, onUpdateMeta, onOpenMobileSidebar }) => {
+const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExportPDF, onExportMD, projectData, onUpdateMeta, onOpenMobileSidebar, session, onSignOut, onShowAuth, syncing }) => {
   const [saved, setSaved] = React.useState(false);
   const [exportingPdf, setExportingPdf] = React.useState(false);
   const [exportingMd, setExportingMd] = React.useState(false);
@@ -76,6 +76,15 @@ const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExpor
           <span data-header-btn-icon style={{ fontSize: 14 }}>{exportingMd ? '⏳' : '🔷'}</span>
           <span data-header-btn-label style={{ fontSize: 12 }}>{exportingMd ? '...' : 'Obsidian'}</span>
         </button>
+        {syncing && (
+          <span title="Sincronizando com a nuvem" style={{ fontSize: 11, color: 'var(--blue)', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--blue)', animation: 'pulse 1s infinite' }} />
+            <span data-header-btn-label>Sync</span>
+          </span>
+        )}
+        {session !== undefined && (
+          <AccountBadge session={session} onSignOut={onSignOut} onShowAuth={onShowAuth} />
+        )}
       </div>
 
       {editingMeta && (

@@ -424,6 +424,128 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
   );
 };
 
+// ─── Pendências inteligentes: cruza dados das etapas/ferramentas e aponta o que falta ───
+// Retorna null se o projeto ainda não tem atividade (não poluir projeto recém-criado).
+const computePendencias = (d) => {
+  const out = [];
+  const completed = d.completedSteps || [];
+  const progRows = (d.programa || []).filter(r => (r.ambiente || '').trim());
+  const leg = d.legislacaoData || {};
+  const legFields = window.LEGISLACAO_FIELDS || [];
+  const legFilled = legFields.filter(f => String(leg[f.key] || '').trim()).length;
+  const hier = d.hierarquizacao || {};
+  const hierCount = Object.keys(hier).length;
+
+  const hasActivity = completed.length > 0 || progRows.length > 0 || legFilled > 0 || hierCount > 0;
+  if (!hasActivity) return null;
+
+  // Programa de Necessidades
+  if (completed.includes(4) && progRows.length === 0)
+    out.push({ level: 'red', text: 'Etapa 4 concluída, mas o Programa de Necessidades está vazio', go: { view: 'tools', tool: 'programa' } });
+  const semArea = progRows.filter(r => !(parseFloat(r.area) > 0));
+  if (progRows.length > 0 && semArea.length > 0)
+    out.push({ level: 'yellow', text: `${semArea.length} ambiente${semArea.length > 1 ? 's' : ''} sem área no Programa de Necessidades`, go: { view: 'tools', tool: 'programa' } });
+
+  // Legislação
+  if (completed.includes(15) && legFilled === 0)
+    out.push({ level: 'red', text: 'Etapa 15 concluída, mas a Legislação Urbanística está vazia', go: { view: 'tools', tool: 'legislacao' } });
+  else if (legFilled > 0 && legFilled < legFields.length)
+    out.push({ level: 'yellow', text: `Legislação urbanística incompleta: ${legFilled}/${legFields.length} parâmetros preenchidos`, go: { view: 'tools', tool: 'legislacao' } });
+
+  // Viabilidade
+  const progTotal = progRows.reduce((s, r) => s + (parseFloat(r.area) || 0), 0);
+  const caMax = parseFloat(leg.ca_maximo) || 0;
+  const areaTerreno = parseFloat(d.viabilidade?.areaTerreno) || 0;
+  if (progTotal > 0 && caMax > 0 && areaTerreno === 0)
+    out.push({ level: 'yellow', text: 'Viabilidade ainda não verificada (programa e CA já preenchidos)', go: { view: 'tools', tool: 'viabilidade' } });
+  if (progTotal > 0 && caMax > 0 && areaTerreno > 0 && progTotal > areaTerreno * caMax)
+    out.push({ level: 'red', text: `O programa (${progTotal.toFixed(0)}m²) NÃO cabe na área edificável (${(areaTerreno * caMax).toFixed(0)}m²)`, go: { view: 'tools', tool: 'viabilidade' } });
+
+  // Hierarquização
+  const sinteseStarted = completed.some(id => id >= 17);
+  const analiseDone = completed.filter(id => id <= 15).length;
+  if (sinteseStarted && hierCount === 0)
+    out.push({ level: 'red', text: 'Etapas de Síntese concluídas sem a Hierarquização preenchida', go: { view: 'tools', tool: 'hierarquizacao' } });
+  else if (hierCount > 0 && !Object.values(hier).includes('grande'))
+    out.push({ level: 'yellow', text: 'Nenhum problema classificado como GRANDE importância na Hierarquização', go: { view: 'tools', tool: 'hierarquizacao' } });
+  else if (analiseDone >= 12 && hierCount === 0)
+    out.push({ level: 'yellow', text: 'Análise quase completa — hora de hierarquizar os problemas (etapa 16)', go: { view: 'step', step: 16 } });
+
+  // Estudo de Papéis × legislação (TO/CA)
+  const papeis = d.papeis;
+  if (papeis?.rooms?.length > 0 && papeis.lotW > 0 && papeis.lotH > 0) {
+    const lotArea = papeis.lotW * papeis.lotH;
+    const toMax = parseFloat(leg.to_maxima) || 0;
+    const terreo = papeis.rooms.filter(r => (r.floor || 0) === 0).reduce((s, r) => s + r.mw * r.mh, 0);
+    const toAtual = (terreo / lotArea) * 100;
+    if (toMax > 0 && toAtual > toMax)
+      out.push({ level: 'red', text: `Taxa de ocupação estourada no Estudo de Papéis (${toAtual.toFixed(0)}% > máx ${toMax}%)`, go: { view: 'tools', tool: 'papeis' } });
+    const caAtual = papeis.rooms.reduce((s, r) => s + r.mw * r.mh, 0) / lotArea;
+    if (caMax > 0 && caAtual > caMax)
+      out.push({ level: 'red', text: `Coeficiente de aproveitamento estourado no Estudo de Papéis (${caAtual.toFixed(2)} > máx ${caMax})`, go: { view: 'tools', tool: 'papeis' } });
+  }
+
+  // Etapas concluídas sem nenhuma anotação
+  const semNotas = completed.filter(id => {
+    const n = (d.stepNotes || {})[id];
+    if (!n) return true;
+    const hasField = Object.values(n.fields || {}).some(v => String(v || '').trim());
+    return !hasField && !String(n.general || '').trim();
+  });
+  if (semNotas.length > 0)
+    out.push({ level: 'yellow', text: `${semNotas.length} etapa${semNotas.length > 1 ? 's' : ''} concluída${semNotas.length > 1 ? 's' : ''} sem nenhuma anotação`, go: { view: 'step', step: semNotas[0] } });
+
+  // Vermelhas primeiro
+  out.sort((a, b) => (a.level === 'red' ? 0 : 1) - (b.level === 'red' ? 0 : 1));
+  return out;
+};
+
+const PendenciasCard = ({ projectData, onNavigate }) => {
+  const pend = computePendencias(projectData);
+  if (!pend) return null;
+
+  const go = (item) => {
+    if (item.go.view === 'step') onNavigate('step', item.go.step);
+    else onNavigate('tools', null, item.go.tool);
+  };
+
+  return (
+    <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: pend.length > 0 ? 14 : 0 }}>
+        <span style={{ fontSize: 18 }}>{pend.length === 0 ? '✅' : '🔍'}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.015em' }}>Pendências</span>
+        {pend.length > 0 && (
+          <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 9px', borderRadius: 999, background: pend.some(p => p.level === 'red') ? 'var(--red-light)' : 'var(--yellow-light)', color: pend.some(p => p.level === 'red') ? 'var(--red)' : 'var(--yellow)' }}>
+            {pend.length}
+          </span>
+        )}
+        {pend.length === 0 && (
+          <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>Nenhuma pendência detectada — dados consistentes até aqui.</span>
+        )}
+      </div>
+      {pend.length > 0 && (
+        <div style={{ display: 'grid', gap: 8 }}>
+          {pend.map((p, i) => (
+            <div
+              key={i}
+              onClick={() => go(p)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+                borderRadius: 'var(--radius)', cursor: 'pointer', transition: 'var(--transition)',
+                background: p.level === 'red' ? 'var(--red-light)' : 'var(--yellow-light)',
+                borderLeft: `3px solid var(--${p.level === 'red' ? 'red' : 'yellow'})`,
+              }}
+            >
+              <span style={{ fontSize: 13, color: 'var(--text-secondary)', flex: 1, lineHeight: 1.45 }}>{p.text}</span>
+              <span style={{ color: `var(--${p.level === 'red' ? 'red' : 'yellow'})`, fontSize: 14, flexShrink: 0 }}>→</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+};
+
 // ─── Dashboard ───
 const DashboardView = ({ projectData, projectName, onNavigate }) => {
   const completed = projectData.completedSteps || [];
@@ -574,6 +696,9 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
           );
         })}
       </div>
+
+      {/* ─── Pendências inteligentes ─── */}
+      <PendenciasCard projectData={projectData} onNavigate={onNavigate} />
 
       {/* ─── Next step callout ─── */}
       {completed.length < 25 && (() => {

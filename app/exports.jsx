@@ -78,6 +78,23 @@ const exportToMarkdown = (project, projectData) => {
     });
   });
 
+  // Entrevista com o Cliente
+  if (projectData.entrevista?.questions?.some(q => String(q.a || '').trim())) {
+    md += '---\n\n## Entrevista com o Cliente\n\n';
+    (window.ENTREVISTA_SECTIONS || []).forEach(sec => {
+      const qs = projectData.entrevista.questions.filter(q => q.section === sec.id && String(q.a || '').trim());
+      if (qs.length) {
+        md += `### ${sec.label}\n`;
+        qs.forEach(q => { md += `- **${q.q}** — ${q.a}\n`; });
+        md += '\n';
+      }
+    });
+    const ambs = (projectData.entrevista.ambientes || []).filter(a => (a.nome || '').trim());
+    if (ambs.length) {
+      md += '**Ambientes identificados:** ' + ambs.map(a => a.nome + (a.area ? ` (${a.area}m²)` : '')).join(', ') + '\n\n';
+    }
+  }
+
   // Hierarquização
   if (projectData.hierarquizacao && Object.keys(projectData.hierarquizacao).length > 0) {
     const problems = window.HIERARQUIZACAO_PROBLEMS || [];
@@ -452,6 +469,24 @@ const exportToPDF = async (project, projectData) => {
       });
     });
   });
+
+  // ─── Entrevista com o Cliente ───
+  if (projectData.entrevista?.questions?.some(q => String(q.a || '').trim())) {
+    doc.addPage(); pageNum++; y = M; addPageHeader(pageNum);
+    heading('Entrevista com o Cliente', 18);
+    (window.ENTREVISTA_SECTIONS || []).forEach(sec => {
+      const qs = projectData.entrevista.questions.filter(q => q.section === sec.id && String(q.a || '').trim());
+      if (qs.length) {
+        heading(sec.label, 12);
+        qs.forEach(q => kv(q.q, q.a));
+        y += 3;
+      }
+    });
+    const ambs = (projectData.entrevista.ambientes || []).filter(a => (a.nome || '').trim());
+    if (ambs.length) {
+      kv('Ambientes identificados', ambs.map(a => a.nome + (a.area ? ` (${a.area}m²)` : '')).join(', '));
+    }
+  }
 
   // ─── Hierarquização ───
   if (projectData.hierarquizacao && Object.keys(projectData.hierarquizacao).length > 0) {

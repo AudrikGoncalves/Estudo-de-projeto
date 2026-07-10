@@ -5,6 +5,7 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
   React.useEffect(() => { if (initialTool) setActiveTool(initialTool); }, [initialTool]);
 
   const tools = [
+    { id: 'entrevista', title: 'Entrevista com o Cliente', desc: 'Roteiro opcional de perguntas — alimenta o Programa de Necessidades', icon: '💬', color: 'accent' },
     { id: 'programa', title: 'Programa de Necessidades', desc: 'Tabela editável de ambientes, áreas e observações', icon: '▦', color: 'accent' },
     { id: 'predimensionamento', title: 'Pré-dimensionamento', desc: 'Cálculo de áreas por ambiente e total', icon: '⊡', color: 'accent' },
     { id: 'hierarquizacao', title: 'Hierarquização', desc: 'Classificar problemas por importância', icon: '▲', color: 'blue' },
@@ -46,6 +47,7 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
         <Button variant="ghost" onClick={() => setActiveTool(null)}>← Ferramentas</Button>
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>{toolTitle}</h2>
       </div>
+      {activeTool === 'entrevista' && <EntrevistaTool data={projectData} onSave={onSave} />}
       {activeTool === 'programa' && <ProgramaTool data={projectData} onSave={onSave} />}
       {activeTool === 'predimensionamento' && <PreDimensionamentoTool data={projectData} onSave={onSave} />}
       {activeTool === 'hierarquizacao' && <HierarquizacaoTool data={projectData} onSave={onSave} />}
@@ -55,6 +57,118 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
       {activeTool === 'fluxograma' && <FluxogramaTool data={projectData} onSave={onSave} />}
       {activeTool === 'diagrama' && <DiagramaSetoresTool data={projectData} onSave={onSave} />}
       {activeTool === 'papeis' && <EstudoPapeisTool data={projectData} onSave={onSave} />}
+    </div>
+  );
+};
+
+// ─── Entrevista com o Cliente (roteiro opcional e editável) ───
+const EntrevistaTool = ({ data, onSave }) => {
+  const sections = window.ENTREVISTA_SECTIONS || [];
+  const [questions, setQuestions] = React.useState(() => {
+    if (data.entrevista?.questions?.length) return data.entrevista.questions;
+    return (window.ENTREVISTA_DEFAULT_QUESTIONS || []).map((q, i) => ({ id: 'q' + i, section: q.section, q: q.q, a: '' }));
+  });
+  const [ambientes, setAmbientes] = React.useState(() => data.entrevista?.ambientes || [{ nome: '', area: '' }]);
+  const [saved, setSaved] = React.useState(false);
+  const [sentMsg, setSentMsg] = React.useState(null);
+
+  const setQ = (id, key, val) => setQuestions(p => p.map(q => q.id === id ? { ...q, [key]: val } : q));
+  const removeQ = (id) => setQuestions(p => p.filter(q => q.id !== id));
+  const addQ = (section) => setQuestions(p => [...p, { id: 'q' + Date.now(), section, q: '', a: '' }]);
+
+  const setAmb = (i, key, val) => setAmbientes(p => { const n = [...p]; n[i] = { ...n[i], [key]: val }; return n; });
+  const addAmb = () => setAmbientes(p => [...p, { nome: '', area: '' }]);
+  const removeAmb = (i) => setAmbientes(p => p.filter((_, idx) => idx !== i));
+
+  const save = () => {
+    onSave({ ...data, entrevista: { questions, ambientes } });
+    setSaved(true); setTimeout(() => setSaved(false), 2000);
+  };
+
+  const answered = questions.filter(q => (q.a || '').trim()).length;
+  const validAmbientes = ambientes.filter(a => (a.nome || '').trim());
+
+  const enviarAoPrograma = () => {
+    if (!validAmbientes.length) return;
+    const existing = (data.programa || []).filter(p => (p.ambiente || '').trim() || (p.area || '').trim() || (p.obs || '').trim());
+    const names = new Set(existing.map(p => (p.ambiente || '').trim().toLowerCase()));
+    const novos = validAmbientes
+      .filter(a => !names.has(a.nome.trim().toLowerCase()))
+      .map(a => ({ ambiente: a.nome.trim(), area: a.area || '', obs: 'Identificado na entrevista' }));
+    onSave({ ...data, programa: [...existing, ...novos], entrevista: { questions, ambientes } });
+    setSentMsg(novos.length > 0
+      ? `✓ ${novos.length} ambiente${novos.length > 1 ? 's' : ''} enviado${novos.length > 1 ? 's' : ''} ao Programa de Necessidades`
+      : 'Todos os ambientes já estavam no Programa');
+    setTimeout(() => setSentMsg(null), 4000);
+  };
+
+  return (
+    <div>
+      {/* Aviso: roteiro opcional */}
+      <Card style={{ marginBottom: 20, padding: 18, background: 'var(--blue-light)', border: 'none' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--blue)', marginBottom: 6 }}>ROTEIRO OPCIONAL</div>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          Este roteiro é apenas um <strong>ponto de partida</strong> — nenhuma pergunta é obrigatória.
+          Edite o texto de qualquer pergunta, remova as que não fizerem sentido e acrescente as suas.
+          Você pode conduzir a entrevista da maneira que preferir; o objetivo é só não deixar nada importante escapar.
+        </div>
+      </Card>
+
+      {answered > 0 && (
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+          {answered} de {questions.length} perguntas respondidas
+        </div>
+      )}
+
+      {sections.map(sec => {
+        const qs = questions.filter(q => q.section === sec.id);
+        return (
+          <div key={sec.id} style={{ marginBottom: 28 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: 10, textTransform: 'uppercase' }}>{sec.label}</div>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {qs.map(q => (
+                <div key={q.id} style={{ padding: '12px 14px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius)' }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                    <input
+                      value={q.q}
+                      onChange={e => setQ(q.id, 'q', e.target.value)}
+                      placeholder="Escreva sua pergunta..."
+                      style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 13.5, fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'var(--font)', outline: 'none', padding: 0 }}
+                    />
+                    <button onClick={() => removeQ(q.id)} title="Remover pergunta" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 14, padding: '0 4px', lineHeight: 1 }}>✕</button>
+                  </div>
+                  <TextArea value={q.a || ''} onChange={v => setQ(q.id, 'a', v)} placeholder="Resposta do cliente..." rows={2} />
+                </div>
+              ))}
+            </div>
+            <button onClick={() => addQ(sec.id)} style={{ marginTop: 8, background: 'none', border: '1px dashed var(--border)', borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 12, padding: '6px 14px', fontFamily: 'var(--font)' }}>+ Pergunta</button>
+          </div>
+        );
+      })}
+
+      {/* Ambientes identificados */}
+      <Card style={{ padding: 18, marginBottom: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', marginBottom: 4 }}>AMBIENTES IDENTIFICADOS NA ENTREVISTA</div>
+        <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginBottom: 14, lineHeight: 1.5 }}>
+          Anote os ambientes que surgirem durante a conversa e envie de uma vez ao Programa de Necessidades.
+        </div>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {ambientes.map((a, i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Input value={a.nome} onChange={v => setAmb(i, 'nome', v)} placeholder="Ex: Home office" style={{ flex: 1 }} />
+              <Input value={a.area} onChange={v => setAmb(i, 'area', v)} placeholder="m² (opcional)" style={{ width: 110 }} />
+              <button onClick={() => removeAmb(i)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: 16 }}>×</button>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Button variant="secondary" onClick={addAmb}>+ Ambiente</Button>
+          <Button onClick={enviarAoPrograma} disabled={validAmbientes.length === 0}>→ Enviar ao Programa ({validAmbientes.length})</Button>
+          {sentMsg && <span style={{ fontSize: 12.5, color: 'var(--green)', fontWeight: 600 }}>{sentMsg}</span>}
+        </div>
+      </Card>
+
+      <Button onClick={save}>{saved ? '✓ Salvo!' : 'Salvar entrevista'}</Button>
     </div>
   );
 };

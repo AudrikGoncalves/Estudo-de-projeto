@@ -6,7 +6,8 @@ const STEPS_DATA = [
     tips: ['Não proponha soluções formais nesta etapa', 'Foque em compreender o tema antes de projetar'] },
   { id: 2, phase: 'analise', group: 'usuario', title: 'Usuário', subtitle: 'Perfil do usuário e do cliente', icon: '◉', color: 'accent',
     fields: ['Perfil dos usuários (idade, renda, hábitos)', 'Grupos distintos e suas particularidades', 'Objetivos e restrições do cliente', 'Orçamento disponível (faixa)'],
-    tips: ['Se cliente ≠ usuário, entrevistar ambos', 'Registrar divergências entre demandas'] },
+    tips: ['Se cliente ≠ usuário, entrevistar ambos', 'Registrar divergências entre demandas'],
+    hasTool: 'entrevista' },
   { id: 3, phase: 'analise', group: 'usuario', title: 'Usos e Funções', subtitle: 'Funções que o espaço deve cumprir', icon: '◈', color: 'accent',
     fields: ['Funções necessárias ao usuário', 'Funções exigidas pela legislação', 'Funções não-convencionais identificadas'],
     tips: ['NÃO dimensione ou distribua espacialmente ainda'] },
@@ -133,7 +134,38 @@ const HIERARQUIZACAO_PROBLEMS = [
   { id: 'legislacao', label: 'Legislação', group: 'Lugar/Terreno' },
 ];
 
+// Roteiro sugerido para a Entrevista com o Cliente (ferramenta opcional — o usuário edita livremente)
+const ENTREVISTA_SECTIONS = [
+  { id: 'perfil', label: 'Perfil e usuários' },
+  { id: 'usos', label: 'Usos e rotina' },
+  { id: 'necessidades', label: 'Necessidades e desejos' },
+  { id: 'orcamento', label: 'Orçamento e restrições' },
+  { id: 'referencias', label: 'Referências e gostos' },
+];
+
+const ENTREVISTA_DEFAULT_QUESTIONS = [
+  { section: 'perfil', q: 'Quem vai usar o espaço? Quantas pessoas, quais idades?' },
+  { section: 'perfil', q: 'Como é a rotina diária de cada usuário?' },
+  { section: 'perfil', q: 'Há previsão de mudanças nos próximos anos (filhos, trabalho, envelhecimento)?' },
+  { section: 'perfil', q: 'Há animais de estimação?' },
+  { section: 'usos', q: 'Quais atividades acontecem no dia a dia do espaço?' },
+  { section: 'usos', q: 'Alguém trabalha ou estuda em casa? Precisa de espaço dedicado?' },
+  { section: 'usos', q: 'Costuma receber visitas ou hóspedes? Com que frequência?' },
+  { section: 'usos', q: 'O que funciona bem no espaço atual? O que incomoda?' },
+  { section: 'necessidades', q: 'Quais ambientes são indispensáveis?' },
+  { section: 'necessidades', q: 'Quais ambientes são desejados, mas não essenciais?' },
+  { section: 'necessidades', q: 'Há algum ambiente incomum ou específico (ateliê, oficina, adega...)?' },
+  { section: 'necessidades', q: 'O que não pode faltar de jeito nenhum? (a essência)' },
+  { section: 'orcamento', q: 'Qual a faixa de orçamento disponível para a obra?' },
+  { section: 'orcamento', q: 'Existe prazo desejado para o projeto e para a obra?' },
+  { section: 'orcamento', q: 'Há restrições importantes (acessibilidade, privacidade, segurança)?' },
+  { section: 'referencias', q: 'Tem projetos ou imagens de referência que gosta?' },
+  { section: 'referencias', q: 'Materiais, cores ou estilos que ama — ou detesta?' },
+];
+
 window.STEPS_DATA = STEPS_DATA;
 window.PHASES = PHASES;
 window.LEGISLACAO_FIELDS = LEGISLACAO_FIELDS;
 window.HIERARQUIZACAO_PROBLEMS = HIERARQUIZACAO_PROBLEMS;
+window.ENTREVISTA_SECTIONS = ENTREVISTA_SECTIONS;
+window.ENTREVISTA_DEFAULT_QUESTIONS = ENTREVISTA_DEFAULT_QUESTIONS;

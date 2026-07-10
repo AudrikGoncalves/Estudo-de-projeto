@@ -14,6 +14,9 @@ const App = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [saveStatus, setSaveStatus] = React.useState('saved'); // saved | saving | dirty
   const saveTimerRef = React.useRef(null);
+  const [confirmDelete, setConfirmDelete] = React.useState(null); // id do projeto a excluir
+  const [confirmLeave, setConfirmLeave] = React.useState(false);
+  const [showNewProjectPrompt, setShowNewProjectPrompt] = React.useState(false);
 
   const currentProject = projects.find(p => p.id === currentProjectId);
   const userId = session?.user?.id;
@@ -86,10 +89,15 @@ const App = () => {
     setSaveStatus('saved');
   };
 
-  const handleDeleteProject = async (id) => {
-    if (!confirm('Excluir este projeto?')) return;
+  const handleDeleteProject = (id) => setConfirmDelete(id);
+
+  const doDeleteProject = async () => {
+    const id = confirmDelete;
+    setConfirmDelete(null);
+    if (!id) return;
     saveProjects(projects.filter(p => p.id !== id));
     localStorage.removeItem(`mp_proj_${id}`);
+    try { await imgDeleteProject(id); } catch (e) { console.warn('img delete fail', e); }
     if (currentProjectId === id) {
       setCurrentProjectId(null);
       localStorage.removeItem('mp_current');
@@ -107,7 +115,21 @@ const App = () => {
     saveProjects([...projects, newProj]);
     const srcData = loadProject(id);
     saveProject(newId, srcData);
+    try { await imgCopyProject(id, newId); } catch (e) { console.warn('img copy fail', e); }
     if (userId) { try { await cloudUpsertProject(userId, newProj, srcData); } catch (e) { console.warn('cloud dup fail', e); } }
+  };
+
+  const handleImportBackup = async (file) => {
+    const backupProjects = await parseBackupFile(file);
+    const { merged, count } = await importBackup(backupProjects, projects);
+    saveProjects(merged);
+    if (userId) {
+      for (const bp of backupProjects) {
+        const proj = merged.find(p => p.name === bp.meta.name || p.id === bp.meta.id);
+        if (proj) { try { await cloudUpsertProject(userId, proj, loadProject(proj.id)); } catch (e) { console.warn('cloud backup sync fail', e); } }
+      }
+    }
+    return count;
   };
 
   const handleSaveData = (newData) => {
@@ -140,11 +162,16 @@ const App = () => {
     }
   };
 
-  const handleGoHome = () => {
-    if (saveStatus !== 'saved' && !confirm('Há alterações não salvas. Deseja sair mesmo assim?')) return;
+  const goHomeNow = () => {
+    setConfirmLeave(false);
     setCurrentProjectId(null);
     localStorage.removeItem('mp_current');
     setCurrentView('home');
+  };
+
+  const handleGoHome = () => {
+    if (saveStatus !== 'saved') { setConfirmLeave(true); return; }
+    goHomeNow();
   };
 
   const handleExportPDF = async () => {
@@ -223,6 +250,7 @@ const App = () => {
               onCreateProject={handleCreateProject}
               onSelectProject={handleSelectProject}
               onDeleteProject={handleDeleteProject}
+              onImportBackup={handleImportBackup}
             />
           )}
           {currentView === 'dashboard' && (
@@ -238,6 +266,7 @@ const App = () => {
               projectData={projectData}
               onSave={handleSaveData}
               onNavigate={handleNavigate}
+              projectId={currentProjectId}
             />
           )}
           {currentView === 'tools' && (
@@ -258,7 +287,36 @@ const App = () => {
         onSelect={handleSelectProject}
         onDelete={handleDeleteProject}
         onDuplicate={handleDuplicateProject}
-        onNew={() => { const name = prompt('Nome do novo projeto:'); if (name?.trim()) handleCreateProject(name.trim()); }}
+        onNew={() => setShowNewProjectPrompt(true)}
+      />
+
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title="Excluir este projeto?"
+        message="Todas as etapas, ferramentas e imagens deste projeto serão removidas. Essa ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        danger
+        onConfirm={doDeleteProject}
+        onCancel={() => setConfirmDelete(null)}
+      />
+
+      <ConfirmDialog
+        open={confirmLeave}
+        title="Alterações não salvas"
+        message="Há alterações que ainda não foram salvas. Deseja sair mesmo assim?"
+        confirmLabel="Sair sem salvar"
+        danger
+        onConfirm={goHomeNow}
+        onCancel={() => setConfirmLeave(false)}
+      />
+
+      <PromptDialog
+        open={showNewProjectPrompt}
+        title="Novo projeto"
+        placeholder="Nome do projeto (ex: Residência Silva)"
+        submitLabel="Criar"
+        onSubmit={(name) => { setShowNewProjectPrompt(false); handleCreateProject(name); }}
+        onCancel={() => setShowNewProjectPrompt(false)}
       />
 
     </div>

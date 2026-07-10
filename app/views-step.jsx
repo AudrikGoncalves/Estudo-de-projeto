@@ -1,5 +1,62 @@
+// ─── Painel: problemas priorizados na Hierarquização (etapas de Síntese/Avaliação) ───
+// O método manda confrontar conceito, partido e EP com os problemas de GRANDE importância.
+const PriorityProblemsPanel = ({ projectData, onNavigate }) => {
+  const hier = projectData.hierarquizacao || {};
+  const problems = window.HIERARQUIZACAO_PROBLEMS || [];
+  const grandes = problems.filter(p => hier[p.id] === 'grande');
+  const medias = problems.filter(p => hier[p.id] === 'media');
+  const hasAny = Object.keys(hier).length > 0;
+
+  if (!hasAny) {
+    return (
+      <Card
+        style={{ marginBottom: 24, padding: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, borderLeft: '3px solid var(--red)' }}
+        onClick={() => onNavigate('tools', null, 'hierarquizacao')}
+      >
+        <span style={{ fontSize: 20 }}>▲</span>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 600 }}>Hierarquização ainda não preenchida</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Classifique os problemas na etapa 16 para confrontá-los aqui com suas decisões</div>
+        </div>
+        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>→</span>
+      </Card>
+    );
+  }
+
+  return (
+    <Card style={{ marginBottom: 24, padding: 18, background: 'var(--red-light)', border: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 10 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--red)' }}>PROBLEMAS DE GRANDE IMPORTÂNCIA</div>
+        <button
+          onClick={() => onNavigate('tools', null, 'hierarquizacao')}
+          style={{ background: 'none', border: 'none', color: 'var(--red)', fontSize: 11, cursor: 'pointer', textDecoration: 'underline', padding: 0, marginLeft: 'auto', fontFamily: 'var(--font)' }}
+        >editar</button>
+      </div>
+      {grandes.length === 0 ? (
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Nenhum problema classificado como GRANDE. Revise a Hierarquização.</div>
+      ) : (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {grandes.map(p => (
+            <span key={p.id} style={{ fontSize: 12.5, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: 'var(--bg-elevated)', color: 'var(--red)', border: '1px solid var(--red)' }}>
+              {p.label}
+            </span>
+          ))}
+        </div>
+      )}
+      {medias.length > 0 && (
+        <div style={{ marginTop: 10, fontSize: 11.5, color: 'var(--text-secondary)' }}>
+          <strong>Média:</strong> {medias.map(p => p.label).join(' · ')}
+        </div>
+      )}
+      <div style={{ marginTop: 10, fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+        Confronte cada decisão desta etapa com os problemas acima — eles são o critério de avaliação do projeto.
+      </div>
+    </Card>
+  );
+};
+
 // ─── Step Detail View ───
-const StepView = ({ step, projectData, onSave, onNavigate }) => {
+const StepView = ({ step, projectData, onSave, onNavigate, projectId }) => {
   const notes = (projectData.stepNotes || {})[step.id] || {};
   const completed = (projectData.completedSteps || []).includes(step.id);
   const [fieldValues, setFieldValues] = React.useState(() => notes.fields || {});
@@ -36,7 +93,7 @@ const StepView = ({ step, projectData, onSave, onNavigate }) => {
   const next = step.id < 25 ? STEPS_DATA.find(s => s.id === step.id + 1) : null;
 
   return (
-    <div data-step-view style={{ padding: '32px 40px', maxWidth: 820, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%', paddingBottom: 80 }}>
+    <div data-step-view style={{ padding: '32px 40px 80px', maxWidth: 820, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
         <Badge label={step.phase === 'analise' ? 'Análise' : step.phase === 'sintese' ? 'Síntese' : 'Avaliação'} color={step.color} />
@@ -61,6 +118,9 @@ const StepView = ({ step, projectData, onSave, onNavigate }) => {
         </Card>
       )}
 
+      {/* Problemas priorizados — só nas etapas de Síntese/Avaliação (após a Hierarquização) */}
+      {step.id > 16 && <PriorityProblemsPanel projectData={projectData} onNavigate={onNavigate} />}
+
       {/* Fields */}
       <div style={{ display: 'grid', gap: 20, marginBottom: 28 }}>
         {step.fields.map((f, i) => (
@@ -70,6 +130,9 @@ const StepView = ({ step, projectData, onSave, onNavigate }) => {
           </div>
         ))}
       </div>
+
+      {/* Imagens da etapa */}
+      <StepImages projectId={projectId} stepId={step.id} />
 
       {/* General notes */}
       <div style={{ marginBottom: 28 }}>

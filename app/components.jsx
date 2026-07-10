@@ -285,6 +285,141 @@ const Input = ({ value, onChange, placeholder, style }) => (
   />
 );
 
+// ─── Dialogs (substituem confirm()/prompt() nativos) ───
+const dialogStyles = {
+  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, animation: 'fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)' },
+  body: { background: 'var(--bg-elevated)', borderRadius: 'var(--radius-xl)', padding: 26, width: 400, maxWidth: '92vw', boxShadow: 'var(--shadow-xl)', animation: 'scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)', border: '1px solid var(--border-light)' },
+};
+
+const ConfirmDialog = ({ open, title, message, confirmLabel = 'Confirmar', danger, onConfirm, onCancel }) => {
+  React.useEffect(() => {
+    if (!open) return;
+    const h = (e) => { if (e.key === 'Escape') onCancel(); if (e.key === 'Enter') onConfirm(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [open, onConfirm, onCancel]);
+  if (!open) return null;
+  return (
+    <div style={dialogStyles.overlay} onClick={onCancel}>
+      <div style={dialogStyles.body} onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{title}</div>
+        {message && <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 20 }}>{message}</div>}
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <Button variant="ghost" onClick={onCancel}>Cancelar</Button>
+          <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm}>{confirmLabel}</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PromptDialog = ({ open, title, message, placeholder, initialValue = '', submitLabel = 'OK', onSubmit, onCancel }) => {
+  const [value, setValue] = React.useState(initialValue);
+  React.useEffect(() => { if (open) setValue(initialValue); }, [open]);
+  if (!open) return null;
+  const submit = () => { if (value.trim()) onSubmit(value.trim()); };
+  return (
+    <div style={dialogStyles.overlay} onClick={onCancel}>
+      <div style={dialogStyles.body} onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{title}</div>
+        {message && <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.55, marginBottom: 14 }}>{message}</div>}
+        <input
+          autoFocus
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') submit(); if (e.key === 'Escape') onCancel(); }}
+          placeholder={placeholder}
+          style={{ width: '100%', padding: '12px 16px', borderRadius: 'var(--radius)', border: '1px solid var(--border)', fontSize: 14.5, fontFamily: 'var(--font)', background: 'var(--bg)', color: 'var(--text-primary)', outline: 'none', marginBottom: 18 }}
+        />
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <Button variant="ghost" onClick={onCancel}>Cancelar</Button>
+          <Button onClick={submit} disabled={!value.trim()}>{submitLabel}</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Undo history for canvas tools (Ctrl+Z) ───
+const useCanvasHistory = (max = 40) => {
+  const past = React.useRef([]);
+  const push = (snapshot) => {
+    past.current.push(JSON.stringify(snapshot));
+    if (past.current.length > max) past.current.shift();
+  };
+  const undo = () => {
+    const prev = past.current.pop();
+    return prev ? JSON.parse(prev) : null;
+  };
+  return { push, undo, canUndo: () => past.current.length > 0 };
+};
+
+// ─── Download canvas as PNG ───
+const downloadCanvasPNG = (canvas, filename) => {
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = filename.replace(/\s+/g, '-').toLowerCase() + '.png';
+  a.click();
+};
+
+// ─── Force-directed layout (usado por Diagrama e Fluxograma) ───
+// items: [{id, x, y}], links: [{from, to}], getRadius(item) -> px
+const forceLayout = (items, links, { width = 800, height = 500, getRadius, iterations = 220, linkStrength = 0.012 }) => {
+  const pos = {};
+  items.forEach((it, i) => {
+    // Se não tem posição, distribui em círculo
+    const angle = (i / items.length) * Math.PI * 2;
+    pos[it.id] = { x: it.x || width / 2 + Math.cos(angle) * 150, y: it.y || height / 2 + Math.sin(angle) * 120 };
+  });
+  const radii = {};
+  items.forEach(it => { radii[it.id] = getRadius(it); });
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const cooling = 1 - iter / iterations;
+    // Repulsão entre todos + colisão
+    for (let i = 0; i < items.length; i++) {
+      for (let j = i + 1; j < items.length; j++) {
+        const a = pos[items[i].id], b = pos[items[j].id];
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const minDist = radii[items[i].id] + radii[items[j].id] + 24;
+        if (d < minDist) {
+          const push = (minDist - d) / 2 * 0.5 * cooling + 0.5;
+          dx /= d; dy /= d;
+          a.x -= dx * push; a.y -= dy * push;
+          b.x += dx * push; b.y += dy * push;
+        }
+      }
+    }
+    // Atração pelas ligações
+    links.forEach(l => {
+      const a = pos[l.from], b = pos[l.to];
+      if (!a || !b) return;
+      const ideal = radii[l.from] + radii[l.to] + 40;
+      let dx = b.x - a.x, dy = b.y - a.y;
+      const d = Math.sqrt(dx * dx + dy * dy) || 1;
+      const force = (d - ideal) * linkStrength * cooling;
+      dx /= d; dy /= d;
+      a.x += dx * force * d * 0.05; a.y += dy * force * d * 0.05;
+      b.x -= dx * force * d * 0.05; b.y -= dy * force * d * 0.05;
+    });
+    // Gravidade para o centro
+    items.forEach(it => {
+      const p = pos[it.id];
+      p.x += (width / 2 - p.x) * 0.004 * cooling;
+      p.y += (height / 2 - p.y) * 0.004 * cooling;
+    });
+  }
+  // Clamp nos limites
+  items.forEach(it => {
+    const p = pos[it.id], r = radii[it.id];
+    p.x = Math.max(r + 8, Math.min(width - r - 8, p.x));
+    p.y = Math.max(r + 8, Math.min(height - r - 8, p.y));
+  });
+  return pos;
+};
+
 window.useProjectStore = useProjectStore;
 window.loadProject = loadProject;
 window.saveProject = saveProject;
@@ -294,3 +429,8 @@ window.Badge = Badge;
 window.Button = Button;
 window.TextArea = TextArea;
 window.Input = Input;
+window.ConfirmDialog = ConfirmDialog;
+window.PromptDialog = PromptDialog;
+window.useCanvasHistory = useCanvasHistory;
+window.downloadCanvasPNG = downloadCanvasPNG;
+window.forceLayout = forceLayout;

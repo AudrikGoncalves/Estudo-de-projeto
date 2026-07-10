@@ -228,6 +228,8 @@ const headerStyles = {
     padding: '5px 12px',
     borderRadius: 999,
     letterSpacing: '-0.005em',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   },
 };
 

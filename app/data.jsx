@@ -116,6 +116,24 @@ const LEGISLACAO_FIELDS = [
   { key: 'tombamento', label: 'Tombamentos / restrições patrimoniais', placeholder: '' },
 ];
 
+// Problemas classificáveis na Hierarquização (compartilhado entre a ferramenta e o painel das etapas de Síntese/Avaliação)
+const HIERARQUIZACAO_PROBLEMS = [
+  { id: 'tema', label: 'Tema', group: 'Usuário/Uso' },
+  { id: 'usuario', label: 'Usuário / Cliente', group: 'Usuário/Uso' },
+  { id: 'usos', label: 'Usos / Funções', group: 'Usuário/Uso' },
+  { id: 'programa', label: 'Programa de necessidades', group: 'Usuário/Uso' },
+  { id: 'setores', label: 'Setores', group: 'Usuário/Uso' },
+  { id: 'fluxos', label: 'Fluxos / Funcionamento', group: 'Usuário/Uso' },
+  { id: 'predim', label: 'Pré-Dimensionamento', group: 'Usuário/Uso' },
+  { id: 'forma', label: 'Forma e dimensão do terreno', group: 'Lugar/Terreno' },
+  { id: 'topografia', label: 'Topografia', group: 'Lugar/Terreno' },
+  { id: 'sol_ventos', label: 'Sol e ventos', group: 'Lugar/Terreno' },
+  { id: 'acessos', label: 'Acessos', group: 'Lugar/Terreno' },
+  { id: 'entorno', label: 'Entorno', group: 'Lugar/Terreno' },
+  { id: 'legislacao', label: 'Legislação', group: 'Lugar/Terreno' },
+];
+
 window.STEPS_DATA = STEPS_DATA;
 window.PHASES = PHASES;
 window.LEGISLACAO_FIELDS = LEGISLACAO_FIELDS;
+window.HIERARQUIZACAO_PROBLEMS = HIERARQUIZACAO_PROBLEMS;

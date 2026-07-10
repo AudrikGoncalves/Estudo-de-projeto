@@ -57,22 +57,20 @@ const exportToMarkdown = (project, projectData) => {
         const isDone = (projectData.completedSteps || []).includes(sId);
         md += `#### ${step.id}. ${step.title} ${isDone ? '✅' : ''}\n\n`;
 
-        // Render fields
+        // Campos: stepNotes[id] = { fields: { <índice>: valor }, general: texto }
+        const note = (projectData.stepNotes || {})[sId] || {};
         if (step.fields) {
-          step.fields.forEach(field => {
-            const key = `${sId}_${field.id}`;
-            const value = (projectData.stepFields || {})[key] || '';
+          step.fields.forEach((fieldLabel, i) => {
+            const value = (note.fields || {})[i] || '';
             if (value) {
-              md += `- **${field.label}:** ${value}\n`;
+              md += `- **${fieldLabel}:** ${value}\n`;
             }
           });
         }
 
-        // Notes
-        const note = (projectData.stepNotes || {})[sId];
-        if (note) {
+        if (note.general) {
           md += `\n> [!NOTE] Anotação\n`;
-          note.split('\n').forEach(line => { md += `> ${line}\n`; });
+          String(note.general).split('\n').forEach(line => { md += `> ${line}\n`; });
           md += '\n';
         }
         md += '\n';
@@ -80,13 +78,27 @@ const exportToMarkdown = (project, projectData) => {
     });
   });
 
+  // Hierarquização
+  if (projectData.hierarquizacao && Object.keys(projectData.hierarquizacao).length > 0) {
+    const problems = window.HIERARQUIZACAO_PROBLEMS || [];
+    md += '---\n\n## Hierarquização dos Problemas\n\n';
+    [['grande', 'GRANDE importância'], ['media', 'MÉDIA importância'], ['pequena', 'PEQUENA importância']].forEach(([lvl, label]) => {
+      const items = problems.filter(p => projectData.hierarquizacao[p.id] === lvl);
+      if (items.length) {
+        md += `### ${label}\n`;
+        items.forEach(p => { md += `- ${p.label}\n`; });
+        md += '\n';
+      }
+    });
+  }
+
   // Programa de necessidades
   if (projectData.programa?.length > 0) {
     md += '---\n\n## Programa de Necessidades\n\n';
-    md += '| Ambiente | Usuários | Uso | Área (m²) | Observações |\n';
-    md += '|---|---|---|---|---|\n';
+    md += '| Ambiente | Área (m²) | Observações |\n';
+    md += '|---|---|---|\n';
     projectData.programa.forEach(p => {
-      md += `| ${p.ambiente || ''} | ${p.usuarios || ''} | ${p.uso || ''} | ${p.area || ''} | ${p.obs || ''} |\n`;
+      md += `| ${p.ambiente || ''} | ${p.area || ''} | ${p.obs || ''} |\n`;
     });
     const total = projectData.programa.reduce((s, p) => s + (parseFloat(p.area) || 0), 0);
     md += `\n**Área total:** ${total.toFixed(2)} m²\n\n`;
@@ -216,16 +228,35 @@ const renderDiagramaToCanvas = (data) => {
   const ctx = c.getContext('2d');
   ctx.fillStyle = '#FAFAF8'; ctx.fillRect(0, 0, W, H);
 
+  // Raio proporcional à área (mesma regra da ferramenta)
+  const radius = (b) => Math.max(18, Math.sqrt(((b.area || 30) * 8) / Math.PI));
+  const proxStyle = {
+    essencial: { width: 4, color: '#8B4513', dash: false },
+    desejavel: { width: 2.5, color: '#4A6FA5', dash: false },
+    indiferente: { width: 1.5, color: '#B0ADA5', dash: true },
+    indesejavel: { width: 3, color: '#A33B2E', dash: false, cross: true },
+  };
+
   (data.diagramaProx || []).forEach(pr => {
     const f = bubbles.find(b => b.id === pr.from);
     const t = bubbles.find(b => b.id === pr.to);
     if (!f || !t) return;
+    const st = proxStyle[pr.type] || proxStyle.essencial;
     ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y);
-    ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.strokeStyle = st.color; ctx.lineWidth = st.width;
+    if (st.dash) ctx.setLineDash([8, 5]); else ctx.setLineDash([]);
+    ctx.stroke(); ctx.setLineDash([]);
+    if (st.cross) {
+      const mx = (f.x + t.x) / 2, my = (f.y + t.y) / 2;
+      ctx.beginPath(); ctx.moveTo(mx - 7, my - 7); ctx.lineTo(mx + 7, my + 7);
+      ctx.moveTo(mx + 7, my - 7); ctx.lineTo(mx - 7, my + 7);
+      ctx.strokeStyle = st.color; ctx.lineWidth = 2.5; ctx.stroke();
+    }
   });
 
   bubbles.forEach(b => {
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+    const r = radius(b);
+    ctx.beginPath(); ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(194,120,86,0.25)'; ctx.fill();
     ctx.strokeStyle = '#8B4513'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.font = '600 12px sans-serif'; ctx.fillStyle = '#1A1917';
@@ -365,6 +396,31 @@ const exportToPDF = async (project, projectData) => {
   addPageFooter();
   doc.addPage(); pageNum++; y = M; addPageHeader(pageNum);
 
+  // ─── Imagens por etapa (IndexedDB) ───
+  let imagesByStep = {};
+  try {
+    const allImages = await imgListByProject(project.id);
+    for (const img of allImages) {
+      if (!imagesByStep[img.stepId]) imagesByStep[img.stepId] = [];
+      imagesByStep[img.stepId].push({ dataUrl: await blobToDataURL(img.blob), w: img.w, h: img.h });
+    }
+  } catch (e) { console.warn('pdf: sem imagens', e); }
+
+  const addStepImages = (sId) => {
+    const imgs = imagesByStep[sId] || [];
+    imgs.forEach(img => {
+      try {
+        const maxW = W - M * 2;
+        let iw = Math.min(maxW, 110);
+        let ih = iw * (img.h / img.w);
+        if (ih > 90) { ih = 90; iw = ih * (img.w / img.h); }
+        ensureSpace(ih + 6);
+        doc.addImage(img.dataUrl, 'JPEG', M, y, iw, ih);
+        y += ih + 4;
+      } catch (e) { /* imagem inválida — ignora */ }
+    });
+  };
+
   // ─── CONTENT: Steps by Phase ───
   const phases = window.PHASES || [];
   const stepsData = window.STEPS_DATA || [];
@@ -378,32 +434,47 @@ const exportToPDF = async (project, projectData) => {
         if (!step) return;
         const done = (projectData.completedSteps || []).includes(sId);
         heading(`${step.id}. ${step.title} ${done ? '✓' : ''}`, 11);
+        // Campos: stepNotes[id] = { fields: { <índice>: valor }, general: texto }
+        const note = (projectData.stepNotes || {})[sId] || {};
         if (step.fields) {
-          step.fields.forEach(f => {
-            const key = `${sId}_${f.id}`;
-            const val = (projectData.stepFields || {})[key];
-            if (val) kv(f.label, val);
+          step.fields.forEach((fieldLabel, i) => {
+            const val = (note.fields || {})[i];
+            if (val) kv(fieldLabel, val);
           });
         }
-        const note = (projectData.stepNotes || {})[sId];
-        if (note) {
+        if (note.general) {
           ensureSpace(10);
-          doc.setFillColor(245, 242, 235); doc.rect(M, y - 3, W - M * 2, 4, 'F');
-          para(`💡 ${note}`, 9);
+          para(`Anotações: ${note.general}`, 9);
           y += 2;
         }
+        addStepImages(sId);
         y += 3;
       });
     });
   });
+
+  // ─── Hierarquização ───
+  if (projectData.hierarquizacao && Object.keys(projectData.hierarquizacao).length > 0) {
+    const problems = window.HIERARQUIZACAO_PROBLEMS || [];
+    doc.addPage(); pageNum++; y = M; addPageHeader(pageNum);
+    heading('Hierarquização dos Problemas', 18);
+    [['grande', 'GRANDE importância'], ['media', 'MÉDIA importância'], ['pequena', 'PEQUENA importância']].forEach(([lvl, label]) => {
+      const items = problems.filter(p => projectData.hierarquizacao[p.id] === lvl);
+      if (items.length) {
+        heading(label, 12);
+        items.forEach(p => para(`• ${p.label}`, 10));
+        y += 3;
+      }
+    });
+  }
 
   // ─── Programa ───
   if (projectData.programa?.length > 0) {
     doc.addPage(); pageNum++; y = M; addPageHeader(pageNum);
     heading('Programa de Necessidades', 18);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(30);
-    const cols = ['Ambiente', 'Usuários', 'Uso', 'Área (m²)', 'Obs.'];
-    const widths = [45, 25, 35, 25, 40];
+    const cols = ['Ambiente', 'Área (m²)', 'Observações'];
+    const widths = [60, 30, 80];
     let x = M;
     cols.forEach((c, i) => { doc.text(c, x, y); x += widths[i]; });
     y += 2; doc.setDrawColor(200); doc.line(M, y, W - M, y); y += 4;
@@ -411,12 +482,17 @@ const exportToPDF = async (project, projectData) => {
     projectData.programa.forEach(p => {
       ensureSpace(5);
       x = M;
-      [p.ambiente, p.usuarios, p.uso, p.area, p.obs].forEach((v, i) => {
+      [p.ambiente, p.area, p.obs].forEach((v, i) => {
         const s = doc.splitTextToSize(String(v || ''), widths[i] - 2);
         doc.text(s[0] || '', x, y); x += widths[i];
       });
       y += 5;
     });
+    const progTotal = projectData.programa.reduce((s, p) => s + (parseFloat(p.area) || 0), 0);
+    y += 2;
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Total: ${progTotal.toFixed(1)} m²`, M, y);
+    y += 6;
   }
 
   // ─── Diagrams with screenshots ───

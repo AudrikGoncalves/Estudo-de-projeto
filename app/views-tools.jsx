@@ -41,7 +41,7 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
   const toolTitle = tools.find(t => t.id === activeTool)?.title || '';
 
   return (
-    <div data-tools-view style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%', paddingBottom: 80 }}>
+    <div data-tools-view style={{ padding: '32px 40px 80px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <Button variant="ghost" onClick={() => setActiveTool(null)}>← Ferramentas</Button>
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>{toolTitle}</h2>
@@ -175,21 +175,7 @@ const PreDimensionamentoTool = ({ data, onSave }) => {
 
 // ─── Hierarquização ───
 const HierarquizacaoTool = ({ data, onSave }) => {
-  const problems = [
-    { id: 'tema', label: 'Tema', group: 'Usuário/Uso' },
-    { id: 'usuario', label: 'Usuário / Cliente', group: 'Usuário/Uso' },
-    { id: 'usos', label: 'Usos / Funções', group: 'Usuário/Uso' },
-    { id: 'programa', label: 'Programa de necessidades', group: 'Usuário/Uso' },
-    { id: 'setores', label: 'Setores', group: 'Usuário/Uso' },
-    { id: 'fluxos', label: 'Fluxos / Funcionamento', group: 'Usuário/Uso' },
-    { id: 'predim', label: 'Pré-Dimensionamento', group: 'Usuário/Uso' },
-    { id: 'forma', label: 'Forma e dimensão do terreno', group: 'Lugar/Terreno' },
-    { id: 'topografia', label: 'Topografia', group: 'Lugar/Terreno' },
-    { id: 'sol_ventos', label: 'Sol e ventos', group: 'Lugar/Terreno' },
-    { id: 'acessos', label: 'Acessos', group: 'Lugar/Terreno' },
-    { id: 'entorno', label: 'Entorno', group: 'Lugar/Terreno' },
-    { id: 'legislacao', label: 'Legislação', group: 'Lugar/Terreno' },
-  ];
+  const problems = window.HIERARQUIZACAO_PROBLEMS;
 
   const [values, setValues] = React.useState(() => data.hierarquizacao || {});
   const [saved, setSaved] = React.useState(false);

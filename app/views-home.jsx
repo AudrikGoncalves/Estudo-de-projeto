@@ -1,13 +1,39 @@
 // ─── Home / Project Selection ───
-const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject }) => {
+const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject, onImportBackup }) => {
   const [name, setName] = React.useState('');
   const [showNew, setShowNew] = React.useState(false);
+  const [backingUp, setBackingUp] = React.useState(false);
+  const [importing, setImporting] = React.useState(false);
+  const [backupMsg, setBackupMsg] = React.useState(null);
+  const importRef = React.useRef(null);
 
   const create = () => {
     if (!name.trim()) return;
     onCreateProject(name.trim());
     setName('');
     setShowNew(false);
+  };
+
+  const handleExportBackup = async () => {
+    setBackingUp(true);
+    try { await exportBackup(projects); }
+    catch (e) { setBackupMsg({ type: 'error', text: 'Erro ao gerar backup: ' + e.message }); }
+    finally { setBackingUp(false); }
+  };
+
+  const handleImportFile = async (file) => {
+    if (!file) return;
+    setImporting(true);
+    setBackupMsg(null);
+    try {
+      const count = await onImportBackup(file);
+      setBackupMsg({ type: 'ok', text: `${count} projeto${count !== 1 ? 's' : ''} restaurado${count !== 1 ? 's' : ''} com sucesso.` });
+    } catch (e) {
+      setBackupMsg({ type: 'error', text: e.message });
+    } finally {
+      setImporting(false);
+      setTimeout(() => setBackupMsg(null), 6000);
+    }
   };
 
   return (
@@ -141,12 +167,34 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject 
         <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em' }}>
           Seus projetos
         </h2>
-        {projects.length > 0 && (
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
-            {projects.length} {projects.length === 1 ? 'projeto' : 'projetos'}
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          {projects.length > 0 && (
+            <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
+              {projects.length} {projects.length === 1 ? 'projeto' : 'projetos'}
+            </span>
+          )}
+          {projects.length > 0 && (
+            <Button size="sm" variant="ghost" onClick={handleExportBackup} disabled={backingUp} style={{ fontSize: 12 }}>
+              {backingUp ? '⏳ Gerando...' : '⬇ Backup'}
+            </Button>
+          )}
+          <Button size="sm" variant="ghost" onClick={() => importRef.current?.click()} disabled={importing} style={{ fontSize: 12 }}>
+            {importing ? '⏳ Restaurando...' : '⬆ Restaurar'}
+          </Button>
+          <input ref={importRef} type="file" accept="application/json,.json" style={{ display: 'none' }}
+            onChange={e => { handleImportFile(e.target.files[0]); e.target.value = ''; }} />
+        </div>
       </div>
+
+      {backupMsg && (
+        <div style={{
+          marginBottom: 16, padding: '10px 16px', borderRadius: 'var(--radius)', fontSize: 13, fontWeight: 500,
+          background: backupMsg.type === 'ok' ? 'var(--green-light)' : 'var(--red-light)',
+          color: backupMsg.type === 'ok' ? 'var(--green)' : 'var(--red)',
+        }}>
+          {backupMsg.type === 'ok' ? '✓ ' : '✕ '}{backupMsg.text}
+        </div>
+      )}
 
       {projects.length === 0 ? (
         <Card

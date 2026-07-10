@@ -216,7 +216,7 @@ const EstudoPapeisTool = ({ data, onSave }) => {
     ctx.strokeStyle = '#1A1917'; ctx.lineWidth = 2;
     ctx.strokeRect(lotX0, lotY0, lotPxW, lotPxH);
 
-    ctx.font = '600 11px "JetBrains Mono", monospace'; ctx.fillStyle = '#1A1917'; ctx.textAlign = 'center';
+    ctx.font = '600 11px "IBM Plex Mono", monospace'; ctx.fillStyle = '#1A1917'; ctx.textAlign = 'center';
     ctx.fillText(`${lotW.toFixed(1)}m`, lotX0 + lotPxW / 2, lotY0 - 8);
     ctx.save(); ctx.translate(lotX0 - 10, lotY0 + lotPxH / 2); ctx.rotate(-Math.PI / 2);
     ctx.fillText(`${lotH.toFixed(1)}m`, 0, 0); ctx.restore();
@@ -234,7 +234,7 @@ const EstudoPapeisTool = ({ data, onSave }) => {
       ctx.strokeRect(lotX0 + pL, lotY0 + pF, lotPxW - pL - pR, lotPxH - pF - pB);
       ctx.setLineDash([]);
 
-      ctx.font = '400 9px "JetBrains Mono", monospace'; ctx.fillStyle = '#9C988E'; ctx.textAlign = 'center';
+      ctx.font = '400 9px "IBM Plex Mono", monospace'; ctx.fillStyle = '#9C988E'; ctx.textAlign = 'center';
       if (pF > 12) ctx.fillText(`recuo ${recuoFrente}m`, lotX0 + lotPxW / 2, lotY0 + pF / 2 + 3);
       if (pB > 12) ctx.fillText(`recuo ${recuoFundos}m`, lotX0 + lotPxW / 2, lotY0 + lotPxH - pB / 2 + 3);
     }
@@ -244,13 +244,13 @@ const EstudoPapeisTool = ({ data, onSave }) => {
     ctx.translate(CANVAS_W - 30, 30);
     ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(-5, 4); ctx.lineTo(0, 0); ctx.lineTo(5, 4); ctx.closePath();
     ctx.fillStyle = '#1A1917'; ctx.fill();
-    ctx.font = '700 10px "Inter", sans-serif'; ctx.fillStyle = '#1A1917'; ctx.textAlign = 'center';
+    ctx.font = '700 10px "Archivo", sans-serif'; ctx.fillStyle = '#1A1917'; ctx.textAlign = 'center';
     ctx.fillText('N', 0, -18);
     ctx.restore();
 
     // Barra de escala
     ctx.fillStyle = '#1A1917'; ctx.fillRect(lotX0, CANVAS_H - 20, pxPerM * 5, 3);
-    ctx.font = '400 10px "JetBrains Mono", monospace'; ctx.textAlign = 'left'; ctx.fillStyle = '#6B6860';
+    ctx.font = '400 10px "IBM Plex Mono", monospace'; ctx.textAlign = 'left'; ctx.fillStyle = '#6B6860';
     ctx.fillText('5m', lotX0 + pxPerM * 5 + 6, CANVAS_H - 16);
     for (let i = 0; i <= 5; i++) ctx.fillRect(lotX0 + pxPerM * i, CANVAS_H - 24, 1, 7);
 
@@ -285,13 +285,13 @@ const EstudoPapeisTool = ({ data, onSave }) => {
         ctx.fillRect(rx + rw - 4, ry + rh - 4, 6, 6);
       }
 
-      ctx.font = `600 ${rw > 60 ? 12 : 10}px "Inter", sans-serif`;
+      ctx.font = `600 ${rw > 60 ? 12 : 10}px "Archivo", sans-serif`;
       ctx.fillStyle = c.text; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       const cy = ry + rh / 2;
       ctx.fillText(room.name, rx + rw / 2, cy - (showDims ? 7 : 0));
 
       if (showDims) {
-        ctx.font = `400 ${rw > 60 ? 10 : 8}px "JetBrains Mono", monospace`;
+        ctx.font = `400 ${rw > 60 ? 10 : 8}px "IBM Plex Mono", monospace`;
         ctx.fillStyle = c.stroke; ctx.globalAlpha = 0.8;
         ctx.fillText(`${room.mw.toFixed(1)}×${room.mh.toFixed(1)}m`, rx + rw / 2, cy + 7);
         ctx.fillText(`${(room.mw * room.mh).toFixed(1)}m²`, rx + rw / 2, cy + 19);

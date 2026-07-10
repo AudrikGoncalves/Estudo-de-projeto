@@ -38,9 +38,9 @@ const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExpor
           onClick={onOpenMobileSidebar}
           title="Abrir menu"
           aria-label="Abrir menu"
-        >☰</button>
+        ><Icon name="menu" size={18} /></button>
         <button data-header-btn style={headerStyles.iconBtn} onClick={onOpenProjects} title="Meus projetos">
-          <span data-header-btn-icon style={{ fontSize: 16 }}>📁</span>
+          <span data-header-btn-icon><Icon name="folder" size={15} /></span>
           <span data-header-btn-label style={{ fontSize: 12, fontWeight: 600 }}>Projetos</span>
         </button>
         <div data-header-divider style={{ width: 1, height: 24, background: 'var(--border)' }} />
@@ -65,15 +65,15 @@ const AppHeader = ({ currentProject, saveStatus, onOpenProjects, onSave, onExpor
           {saveStatus === 'saved' ? 'Salvo' : saveStatus === 'saving' ? 'Salvando...' : 'Não salvo'}
         </span>
         <button data-header-btn style={headerStyles.iconBtn} onClick={handleSave} title="Salvar agora">
-          <span data-header-btn-icon style={{ fontSize: 14 }}>{saved ? '✓' : '💾'}</span>
+          <span data-header-btn-icon><Icon name={saved ? 'check' : 'save'} size={15} /></span>
           <span data-header-btn-label style={{ fontSize: 12 }}>{saved ? 'Salvo!' : 'Salvar'}</span>
         </button>
         <button data-header-btn style={headerStyles.iconBtn} onClick={handlePdf} title="Exportar PDF" disabled={exportingPdf}>
-          <span data-header-btn-icon style={{ fontSize: 14 }}>{exportingPdf ? '⏳' : '📄'}</span>
+          <span data-header-btn-icon><Icon name={exportingPdf ? 'clock' : 'file'} size={15} /></span>
           <span data-header-btn-label style={{ fontSize: 12 }}>{exportingPdf ? 'Gerando...' : 'PDF'}</span>
         </button>
         <button data-header-btn style={headerStyles.iconBtn} onClick={handleMd} title="Pronto para importar no Obsidian" disabled={exportingMd}>
-          <span data-header-btn-icon style={{ fontSize: 14 }}>{exportingMd ? '⏳' : '🔷'}</span>
+          <span data-header-btn-icon><Icon name={exportingMd ? 'clock' : 'diamond'} size={15} /></span>
           <span data-header-btn-label style={{ fontSize: 12 }}>{exportingMd ? '...' : 'Obsidian'}</span>
         </button>
         {syncing && (
@@ -151,9 +151,9 @@ const ProjectsDrawer = ({ isOpen, onClose, projects, currentId, onSelect, onDele
         <div style={{ flex: 1, overflowY: 'auto', padding: '0 14px 20px' }}>
           {projects.length === 0 && (
             <div style={drawerStyles.empty}>
-              <div style={{ fontSize: 42, opacity: 0.2, marginBottom: 8 }}>📁</div>
+              <div style={{ display: 'flex', justifyContent: 'center', opacity: 0.25, marginBottom: 10 }}><Icon name="folder" size={36} strokeWidth={1.2} /></div>
               <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Nenhum projeto ainda</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Crie o seu primeiro!</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Crie o primeiro.</div>
             </div>
           )}
           {projects.slice().reverse().map(p => {
@@ -193,10 +193,8 @@ const headerStyles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '12px 24px',
-    background: 'color-mix(in oklab, var(--bg-elevated) 82%, transparent)',
-    backdropFilter: 'saturate(180%) blur(14px)',
-    WebkitBackdropFilter: 'saturate(180%) blur(14px)',
-    borderBottom: '1px solid var(--border-light)',
+    background: 'var(--bg)',
+    borderBottom: '1px solid var(--border)',
     gap: 14,
     flexShrink: 0,
     zIndex: 50,
@@ -217,17 +215,18 @@ const headerStyles = {
     fontWeight: 500,
     letterSpacing: '-0.005em',
     transition: 'var(--transition)',
-    boxShadow: 'var(--shadow-xs)',
   },
   statusBadge: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 6,
-    fontSize: 11,
+    fontSize: 9.5,
     fontWeight: 600,
-    padding: '5px 12px',
-    borderRadius: 999,
-    letterSpacing: '-0.005em',
+    fontFamily: 'var(--font-mono)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    padding: '4px 10px',
+    borderRadius: 'var(--radius-xs)',
     whiteSpace: 'nowrap',
     flexShrink: 0,
   },

@@ -156,21 +156,21 @@ const AuthScreen = ({ onSkip, onAuthed }) => {
     }}>
       <div style={{ position: 'absolute', top: 'calc(16px + env(safe-area-inset-top))', right: 16 }}>
         <button data-theme-toggle onClick={toggleT} aria-label="Alternar tema">
-          {currentTheme === 'dark' ? '☀' : '☾'}
+          <Icon name={currentTheme === 'dark' ? 'sun' : 'moon'} size={15} />
         </button>
       </div>
       <div style={{
         width: '100%', maxWidth: 400, background: 'var(--bg-card)',
-        border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)',
-        padding: 32, boxShadow: 'var(--shadow-lg)',
+        border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)',
+        padding: 32,
       }}>
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 14, background: 'var(--accent)',
-            color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, fontWeight: 700, letterSpacing: 2, margin: '0 auto 12px',
-          }}>MP</div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Metodologia de Projeto</h1>
+        <div style={{ marginBottom: 24, borderTop: '3px solid var(--text-primary)', paddingTop: 16 }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.16em', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: 10 }}>
+            GUIA DE PROJETO ARQUITETÔNICO
+          </div>
+          <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 6, letterSpacing: '-0.035em', lineHeight: 1.1 }}>
+            Metodologia<br/>de Projeto<span style={{ color: 'var(--accent)' }}>.</span>
+          </h1>
           <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
             {mode === 'signup' ? 'Crie sua conta para sincronizar entre aparelhos' : 'Entre para acessar seus projetos'}
           </p>
@@ -208,7 +208,7 @@ const AuthScreen = ({ onSkip, onAuthed }) => {
           )}
           <button type="submit" disabled={busy} style={{
             width: '100%', padding: '12px', borderRadius: 'var(--radius)',
-            background: 'var(--accent)', color: '#fff', border: 'none',
+            background: 'var(--text-primary)', color: 'var(--bg)', border: 'none',
             fontSize: 14, fontWeight: 600, fontFamily: 'var(--font)',
             cursor: busy ? 'wait' : 'pointer', opacity: busy ? 0.6 : 1, marginBottom: 12,
           }}>
@@ -254,7 +254,7 @@ const AccountBadge = ({ session, onSignOut, onShowAuth }) => {
           background: 'var(--bg)', color: 'var(--text-primary)', cursor: 'pointer',
           fontFamily: 'var(--font)',
         }}>
-        <span data-header-btn-icon style={{ fontSize: 14 }}>👤</span>
+        <span data-header-btn-icon><Icon name="user" size={14} /></span>
         <span data-header-btn-label style={{ fontSize: 12, fontWeight: 600 }}>Entrar</span>
       </button>
     );
@@ -266,8 +266,9 @@ const AccountBadge = ({ session, onSignOut, onShowAuth }) => {
   return (
     <div style={{ position: 'relative' }}>
       <button onClick={() => setOpen(!open)} title={email} style={{
-        width: 34, height: 34, borderRadius: '50%', background: 'var(--accent)',
-        color: '#fff', border: 'none', fontSize: 12, fontWeight: 700,
+        width: 34, height: 34, borderRadius: 'var(--radius)', background: 'var(--text-primary)',
+        color: 'var(--bg)', border: 'none', fontSize: 11, fontWeight: 600,
+        fontFamily: 'var(--font-mono)',
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>{initials}</button>
       {open && (
@@ -319,7 +320,7 @@ const ThemeToggle = ({ theme, onToggle }) => (
     title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
     aria-label="Alternar tema"
   >
-    {theme === 'dark' ? '☀' : '☾'}
+    <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} />
   </button>
 );
 

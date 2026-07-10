@@ -48,81 +48,59 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
         overflowY: 'auto',
       }}
     >
-      {/* ─── Hero ─── */}
+      {/* ─── Masthead editorial ─── */}
       <section
-        className="mp-gradient-bg"
         style={{
           position: 'relative',
-          textAlign: 'center',
-          padding: '56px 32px 52px',
-          marginBottom: 40,
-          borderRadius: 'var(--radius-2xl)',
-          border: '1px solid var(--border-light)',
-          overflow: 'hidden',
-          boxShadow: 'var(--shadow-sm)',
+          padding: '36px 0 44px',
+          marginBottom: 8,
+          borderTop: '3px solid var(--text-primary)',
         }}
       >
-        <div
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 22,
-            background: 'linear-gradient(135deg, oklch(0.62 0.17 30), oklch(0.48 0.17 25))',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 24,
-            fontWeight: 800,
-            letterSpacing: 2,
-            margin: '0 auto 24px',
-            boxShadow: '0 12px 32px oklch(0.58 0.16 30 / 0.35), inset 0 1px 0 rgba(255,255,255,0.18)',
-            animation: 'scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          }}
-        >
-          MP
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 28, gap: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
+            Guia de projeto arquitetônico
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+            ANÁLISE — SÍNTESE — AVALIAÇÃO
+          </span>
         </div>
         <h1
           data-home-hero-title
           style={{
-            fontSize: 48,
-            fontWeight: 800,
-            letterSpacing: '-0.04em',
-            lineHeight: 1.05,
-            marginBottom: 14,
-            background: 'linear-gradient(180deg, var(--text-primary) 0%, var(--text-secondary) 120%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            fontSize: 58,
+            fontWeight: 700,
+            letterSpacing: '-0.045em',
+            lineHeight: 0.98,
+            marginBottom: 18,
+            color: 'var(--text-primary)',
+            maxWidth: 720,
           }}
         >
-          Metodologia de Projeto
+          Metodologia<br />de Projeto<span style={{ color: 'var(--accent)' }}>.</span>
         </h1>
         <p
           data-home-hero-sub
           style={{
-            fontSize: 18,
+            fontSize: 17,
             color: 'var(--text-secondary)',
-            maxWidth: 560,
-            margin: '0 auto',
+            maxWidth: 520,
             lineHeight: 1.55,
             letterSpacing: '-0.01em',
             fontWeight: 400,
           }}
         >
-          Guia ativo para estudos preliminares de arquitetura.
-          <br />
-          Método Análise · Síntese · Avaliação.
+          Do problema arquitetônico ao estudo preliminar, em 25 etapas estruturadas.
         </p>
 
-        {/* Hero CTA */}
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 30, flexWrap: 'wrap' }}>
+        {/* CTA */}
+        <div style={{ display: 'flex', gap: 10, marginTop: 28, flexWrap: 'wrap' }}>
           <Button size="lg" onClick={() => setShowNew(true)}>
-            <span style={{ fontSize: 18, marginRight: 2 }}>+</span> Novo projeto
+            <Icon name="plus" size={16} /> Novo projeto
           </Button>
           {projects.length > 0 && (
             <Button size="lg" variant="secondary" onClick={() => onSelectProject(projects[0].id)}>
-              Continuar último →
+              Continuar último <Icon name="arrowRight" size={15} />
             </Button>
           )}
         </div>
@@ -133,10 +111,9 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
         <Card
           style={{
             marginBottom: 28,
-            animation: 'scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            animation: 'scaleIn 0.25s cubic-bezier(0.34, 1.3, 0.64, 1)',
             padding: 20,
-            border: '1px solid var(--accent-light)',
-            boxShadow: 'var(--shadow-accent)',
+            borderColor: 'var(--text-primary)',
           }}
         >
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -160,26 +137,28 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'baseline',
-          marginBottom: 18,
-          padding: '0 4px',
+          marginBottom: 0,
+          paddingTop: 22,
+          paddingBottom: 14,
+          borderTop: '1px solid var(--text-primary)',
         }}
       >
-        <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em' }}>
-          Seus projetos
-        </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em' }}>
+          Projetos
           {projects.length > 0 && (
-            <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
-              {projects.length} {projects.length === 1 ? 'projeto' : 'projetos'}
+            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, fontFamily: 'var(--font-mono)', marginLeft: 10 }}>
+              ({String(projects.length).padStart(2, '0')})
             </span>
           )}
+        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {projects.length > 0 && (
             <Button size="sm" variant="ghost" onClick={handleExportBackup} disabled={backingUp} style={{ fontSize: 12 }}>
-              {backingUp ? '⏳ Gerando...' : '⬇ Backup'}
+              <Icon name="download" size={13} /> {backingUp ? 'Gerando...' : 'Backup'}
             </Button>
           )}
           <Button size="sm" variant="ghost" onClick={() => importRef.current?.click()} disabled={importing} style={{ fontSize: 12 }}>
-            {importing ? '⏳ Restaurando...' : '⬆ Restaurar'}
+            <Icon name="upload" size={13} /> {importing ? 'Restaurando...' : 'Restaurar'}
           </Button>
           <input ref={importRef} type="file" accept="application/json,.json" style={{ display: 'none' }}
             onChange={e => { handleImportFile(e.target.files[0]); e.target.value = ''; }} />
@@ -197,84 +176,52 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
       )}
 
       {projects.length === 0 ? (
-        <Card
+        <div
           style={{
             textAlign: 'center',
-            padding: '60px 32px',
-            borderStyle: 'dashed',
-            borderColor: 'var(--border)',
-            background: 'var(--bg-subtle)',
+            padding: '56px 32px',
+            borderTop: '1px solid var(--border)',
+            borderBottom: '1px solid var(--border)',
           }}
         >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              margin: '0 auto 16px',
-              borderRadius: 16,
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-light)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 24,
-              color: 'var(--text-muted)',
-            }}
-          >
-            ◎
-          </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: 15, fontWeight: 500, marginBottom: 4 }}>
             Nenhum projeto ainda
           </p>
           <p style={{ color: 'var(--text-muted)', fontSize: 13.5 }}>
-            Crie seu primeiro projeto para começar a jornada.
+            Comece pelo botão acima — o método cuida do resto.
           </p>
-        </Card>
+        </div>
       ) : (
-        <div style={{ display: 'grid', gap: 14 }}>
+        <div style={{ borderBottom: '1px solid var(--border)' }}>
           {projects.map((p, idx) => {
             const data = loadProject(p.id);
             const done = (data.completedSteps || []).length;
             const pct = Math.round((done / 25) * 100);
-            const initial = p.name[0].toUpperCase();
             return (
-              <Card
+              <div
                 key={p.id}
+                data-premium-card="true"
                 onClick={() => onSelectProject(p.id)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 18,
-                  padding: '20px 22px',
-                  animation: `fadeIn 0.4s ${idx * 50}ms cubic-bezier(0.4, 0, 0.2, 1) both`,
+                  gap: 20,
+                  padding: '18px 8px',
+                  borderTop: '1px solid var(--border)',
+                  cursor: 'pointer',
+                  animation: `fadeIn 0.35s ${idx * 40}ms cubic-bezier(0.4, 0, 0.2, 1) both`,
                 }}
               >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    minWidth: 52,
-                    borderRadius: 16,
-                    background: 'linear-gradient(135deg, var(--accent-light), var(--bg-subtle))',
-                    color: 'var(--accent)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 22,
-                    fontWeight: 700,
-                    letterSpacing: '-0.02em',
-                    border: '1px solid var(--border-light)',
-                  }}
-                >
-                  {initial}
-                </div>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', minWidth: 26 }}>
+                  {String(idx + 1).padStart(2, '0')}
+                </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
-                      fontSize: 16,
+                      fontSize: 17,
                       fontWeight: 600,
-                      letterSpacing: '-0.02em',
-                      marginBottom: 4,
+                      letterSpacing: '-0.025em',
+                      marginBottom: 3,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -282,43 +229,25 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
                   >
                     {p.name}
                   </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      fontSize: 12.5,
-                      color: 'var(--text-muted)',
-                      fontWeight: 500,
-                    }}
-                  >
-                    <span>{done}/25 etapas</span>
-                    <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--text-muted)', opacity: 0.6 }} />
-                    <span style={{ color: pct === 100 ? 'var(--green)' : 'var(--text-muted)', fontWeight: 600 }}>
-                      {pct}% {pct === 100 && '✓'}
-                    </span>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    {String(done).padStart(2, '0')}/25 ETAPAS
+                    {p.cliente ? ` · ${p.cliente.toUpperCase()}` : ''}
                   </div>
                 </div>
-                <div
-                  style={{
-                    width: 80,
-                    height: 6,
-                    background: 'var(--border-light)',
-                    borderRadius: 99,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: `${pct}%`,
-                      height: '100%',
-                      background: pct === 100
-                        ? 'linear-gradient(90deg, var(--green), var(--green))'
-                        : 'linear-gradient(90deg, var(--accent), var(--accent-dark))',
-                      borderRadius: 99,
-                      transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
-                  />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 90, height: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: `${pct}%`,
+                        height: '100%',
+                        background: pct === 100 ? 'var(--green)' : 'var(--text-primary)',
+                        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                      }}
+                    />
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: pct === 100 ? 'var(--green)' : 'var(--text-secondary)', minWidth: 40, textAlign: 'right' }}>
+                    {pct}%
+                  </span>
                 </div>
                 <button
                   onClick={e => { e.stopPropagation(); onDeleteProject(p.id); }}
@@ -328,92 +257,73 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
                     border: 'none',
                     color: 'var(--text-muted)',
                     cursor: 'pointer',
-                    fontSize: 18,
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
+                    width: 30,
+                    height: 30,
+                    borderRadius: 'var(--radius-xs)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     transition: 'var(--transition)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--red-light)'; e.currentTarget.style.color = 'var(--red)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; }}
                 >
-                  ×
+                  <Icon name="x" size={14} />
                 </button>
-              </Card>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* ─── Método Section (premium) ─── */}
-      <div
-        style={{
-          marginTop: 56,
-          padding: '36px 32px',
-          background: 'var(--bg-subtle)',
-          borderRadius: 'var(--radius-xl)',
-          border: '1px solid var(--border-light)',
-        }}
-      >
-        <div style={{ marginBottom: 20 }}>
+      {/* ─── Método (editorial, três colunas com réguas) ─── */}
+      <div style={{ marginTop: 56 }}>
+        <div style={{ paddingTop: 22, paddingBottom: 22, borderTop: '1px solid var(--text-primary)' }}>
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 700,
+              fontSize: 10,
+              fontWeight: 600,
               color: 'var(--accent)',
-              letterSpacing: '0.12em',
+              letterSpacing: '0.16em',
               textTransform: 'uppercase',
+              fontFamily: 'var(--font-mono)',
               marginBottom: 10,
             }}
           >
             O Método
           </div>
-          <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.025em', marginBottom: 6 }}>
+          <h3 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 6 }}>
             Três fases, vinte e cinco etapas
           </h3>
           <p style={{ fontSize: 14.5, color: 'var(--text-secondary)', maxWidth: 540, lineHeight: 1.55 }}>
-            Uma sequência estruturada para transformar o problema arquitetônico em estudo preliminar robusto.
+            Uma sequência estruturada para transformar o problema arquitetônico em estudo preliminar consistente.
           </p>
         </div>
 
         <div
           data-home-phases-grid
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginTop: 24 }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
         >
           {[
-            { phase: 'Análise', desc: '15 etapas de levantamento — jamais resolver, apenas levantar.', color: 'accent', n: '01–15' },
-            { phase: 'Síntese', desc: '6 etapas de conceituação, partido e decisões de projeto.', color: 'blue', n: '16–21' },
-            { phase: 'Avaliação', desc: '4 etapas de verificação e estudo preliminar.', color: 'yellow', n: '22–25' },
+            { phase: 'Análise', desc: '15 etapas de levantamento — jamais resolver, apenas levantar.', n: '01–15', idx: 'I' },
+            { phase: 'Síntese', desc: '6 etapas de conceituação, partido e decisões de projeto.', n: '16–21', idx: 'II' },
+            { phase: 'Avaliação', desc: '4 etapas de verificação e estudo preliminar.', n: '22–25', idx: 'III' },
           ].map((p, idx) => (
             <div
               key={p.phase}
               style={{
-                padding: 22,
-                background: 'var(--bg-elevated)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-light)',
-                boxShadow: 'var(--shadow-xs)',
-                transition: 'var(--transition)',
-                animation: `fadeIn 0.5s ${120 + idx * 80}ms cubic-bezier(0.4, 0, 0.2, 1) both`,
+                paddingTop: 16,
+                borderTop: '1px solid var(--border-strong)',
+                animation: `fadeIn 0.45s ${100 + idx * 70}ms cubic-bezier(0.4, 0, 0.2, 1) both`,
               }}
             >
-              <Badge label={p.phase} color={p.color} />
-              <div
-                style={{
-                  fontSize: 11,
-                  color: 'var(--text-muted)',
-                  marginTop: 12,
-                  fontFamily: 'var(--font-mono)',
-                  letterSpacing: '0.02em',
-                  fontWeight: 500,
-                }}
-              >
-                ETAPAS {p.n}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+                <span style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em' }}>{p.phase}</span>
+                <span style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
+                  ETAPAS {p.n}
+                </span>
               </div>
-              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.55 }}>
+              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
                 {p.desc}
               </div>
             </div>
@@ -512,8 +422,10 @@ const PendenciasCard = ({ projectData, onNavigate }) => {
   return (
     <Card style={{ marginBottom: 20, padding: '20px 24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: pend.length > 0 ? 14 : 0 }}>
-        <span style={{ fontSize: 18 }}>{pend.length === 0 ? '✅' : '🔍'}</span>
-        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.015em' }}>Pendências</span>
+        <span style={{ color: pend.length === 0 ? 'var(--green)' : 'var(--accent)', display: 'flex' }}>
+          <Icon name={pend.length === 0 ? 'check' : 'alert'} size={16} />
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }}>Pendências</span>
         {pend.length > 0 && (
           <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 9px', borderRadius: 999, background: pend.some(p => p.level === 'red') ? 'var(--red-light)' : 'var(--yellow-light)', color: pend.some(p => p.level === 'red') ? 'var(--red)' : 'var(--yellow)' }}>
             {pend.length}
@@ -568,24 +480,25 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
         height: '100%',
       }}
     >
-      <div style={{ marginBottom: 32 }}>
+      <div style={{ marginBottom: 32, borderTop: '3px solid var(--text-primary)', paddingTop: 20 }}>
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 700,
+            fontSize: 10,
+            fontWeight: 600,
             color: 'var(--accent)',
-            letterSpacing: '0.12em',
+            letterSpacing: '0.16em',
             textTransform: 'uppercase',
+            fontFamily: 'var(--font-mono)',
             marginBottom: 8,
           }}
         >
           Projeto
         </div>
-        <h1 style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.035em', marginBottom: 6, lineHeight: 1.1 }}>
+        <h1 style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.04em', marginBottom: 6, lineHeight: 1.05 }}>
           {projectName}
         </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>
-          Visão geral do progresso do projeto
+        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
+          Visão geral do progresso
         </p>
       </div>
 
@@ -603,20 +516,17 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
           <div>
             <div
               style={{
-                fontSize: 52,
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-                background: 'linear-gradient(180deg, var(--accent) 0%, var(--accent-dark) 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                fontSize: 54,
+                fontWeight: 700,
+                letterSpacing: '-0.05em',
+                color: 'var(--text-primary)',
                 lineHeight: 1,
               }}
             >
-              {pct}%
+              {pct}<span style={{ fontSize: 30, fontWeight: 500, color: 'var(--text-muted)' }}>%</span>
             </div>
-            <div style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 6, fontWeight: 500 }}>
-              {completed.length} de 25 etapas concluídas
+            <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 8, fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }}>
+              {String(completed.length).padStart(2, '0')} / 25 ETAPAS CONCLUÍDAS
             </div>
           </div>
           <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', maxWidth: '100%' }}>
@@ -626,13 +536,12 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
                 <div
                   key={i}
                   style={{
-                    width: 11,
+                    width: 9,
                     height: 32,
-                    borderRadius: 4,
-                    background: isDone ? 'var(--accent)' : 'var(--border)',
+                    borderRadius: 1,
+                    background: isDone ? 'var(--text-primary)' : 'var(--border)',
                     transition: 'background var(--transition), transform var(--transition)',
                     cursor: 'pointer',
-                    boxShadow: isDone ? '0 2px 6px var(--accent-glow, rgba(0,0,0,0.08))' : 'none',
                   }}
                   onClick={() => onNavigate('step', i + 1)}
                   onMouseEnter={e => (e.currentTarget.style.transform = 'scaleY(1.12)')}
@@ -708,25 +617,27 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
             style={{
               padding: '22px 26px',
               cursor: 'pointer',
-              background: 'linear-gradient(135deg, var(--bg-elevated), var(--bg-subtle))',
-              border: `1px solid var(--${next.color}-light)`,
+              borderLeft: '3px solid var(--accent)',
             }}
             onClick={() => onNavigate('step', next.id)}
           >
             <div
               style={{
                 fontSize: 10,
-                color: `var(--${next.color})`,
-                marginBottom: 10,
-                letterSpacing: '0.12em',
-                fontWeight: 700,
+                color: 'var(--accent)',
+                marginBottom: 12,
+                letterSpacing: '0.14em',
+                fontWeight: 600,
                 textTransform: 'uppercase',
+                fontFamily: 'var(--font-mono)',
               }}
             >
               Próxima etapa
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <span style={{ fontSize: 32, flexShrink: 0 }}>{next.icon}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              <span style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.04em', flexShrink: 0, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+                {String(next.id).padStart(2, '0')}
+              </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
@@ -736,21 +647,14 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
                     marginBottom: 2,
                   }}
                 >
-                  Etapa {next.id} — {next.title}
+                  {next.title}
                 </div>
                 <div style={{ fontSize: 13.5, color: 'var(--text-secondary)' }}>
                   {next.subtitle}
                 </div>
               </div>
-              <span
-                style={{
-                  marginLeft: 'auto',
-                  fontSize: 22,
-                  color: `var(--${next.color})`,
-                  fontWeight: 300,
-                }}
-              >
-                →
+              <span style={{ marginLeft: 'auto', color: 'var(--text-primary)', display: 'flex' }}>
+                <Icon name="arrowRight" size={18} />
               </span>
             </div>
           </Card>
@@ -762,24 +666,25 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
         style={{
           marginTop: 20,
           padding: '20px 24px',
-          background: 'var(--yellow-light)',
-          border: '1px solid var(--yellow-light)',
+          background: 'var(--bg-subtle)',
           borderLeft: '3px solid var(--yellow)',
         }}
       >
         <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 22, flexShrink: 0 }}>⚠️</span>
+          <span style={{ color: 'var(--yellow)', flexShrink: 0, marginTop: 2 }}><Icon name="alert" size={17} /></span>
           <div>
             <div
               style={{
-                fontSize: 14,
-                fontWeight: 700,
+                fontSize: 10.5,
+                fontWeight: 600,
                 color: 'var(--text-primary)',
-                marginBottom: 4,
-                letterSpacing: '-0.015em',
+                marginBottom: 6,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                fontFamily: 'var(--font-mono)',
               }}
             >
-              Lembrete: Recognição
+              Lembrete — Recognição
             </div>
             <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
               Na etapa de Análise: jamais resolver, apenas levantar. Se perceber que está propondo soluções formais durante a análise, pause e registre como intuição inicial para a síntese.

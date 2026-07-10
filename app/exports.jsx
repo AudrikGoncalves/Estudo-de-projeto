@@ -367,7 +367,7 @@ const exportToPDF = async (project, projectData) => {
     doc.setFontSize(size); doc.setTextColor(30);
     doc.text(text, M, y); y += size * 0.5 + 2;
     if (size >= 14) {
-      doc.setDrawColor(194, 120, 86); doc.setLineWidth(0.8);
+      doc.setDrawColor(191, 45, 25); doc.setLineWidth(0.8);
       doc.line(M, y, M + 30, y); y += 4;
     }
   };
@@ -392,7 +392,7 @@ const exportToPDF = async (project, projectData) => {
   // ─── COVER ───
   doc.setFillColor(250, 249, 247);
   doc.rect(0, 0, W, H, 'F');
-  doc.setFillColor(194, 120, 86); doc.rect(0, 0, W, 3, 'F');
+  doc.setFillColor(191, 45, 25); doc.rect(0, 0, W, 3, 'F');
 
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(140);
   doc.text('METODOLOGIA DE PROJETO', W / 2, 60, { align: 'center' });

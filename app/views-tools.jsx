@@ -20,16 +20,20 @@ const ToolsView = ({ projectData, onSave, activeTool: initialTool }) => {
   if (!activeTool) {
     return (
       <div data-tools-view style={{ padding: '32px 40px', maxWidth: 960, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 6 }}>Ferramentas</h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 28 }}>Ferramentas interativas para auxiliar em cada etapa do processo projetual.</p>
-        <div data-tools-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-          {tools.map(t => (
-            <Card key={t.id} onClick={() => setActiveTool(t.id)} style={{ padding: 20, cursor: 'pointer', transition: 'var(--transition)', borderLeft: `3px solid var(--${t.color})` }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 26, color: `var(--${t.color})` }}>{t.icon}</span>
+        <div style={{ borderTop: '3px solid var(--text-primary)', paddingTop: 20, marginBottom: 28 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 6, letterSpacing: '-0.035em' }}>Ferramentas</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Instrumentos de apoio para cada etapa do processo projetual.</p>
+        </div>
+        <div data-tools-grid style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+          {tools.map((t, i) => (
+            <Card key={t.id} onClick={() => setActiveTool(t.id)} style={{ padding: '18px 20px', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                <span style={{ fontSize: 15, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontWeight: 500, marginTop: 1 }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <div>
-                  <div style={{ fontSize: 15, fontWeight: 600 }}>{t.title}</div>
-                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>{t.desc}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.015em' }}>{t.title}</div>
+                  <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 3, lineHeight: 1.45 }}>{t.desc}</div>
                 </div>
               </div>
             </Card>

@@ -24,9 +24,9 @@ const PriorityProblemsPanel = ({ projectData, onNavigate }) => {
   }
 
   return (
-    <Card style={{ marginBottom: 24, padding: 18, background: 'var(--red-light)', border: 'none' }}>
+    <Card style={{ marginBottom: 24, padding: 18, background: 'var(--bg-subtle)', border: 'none', borderLeft: '3px solid var(--accent)', borderRadius: 'var(--radius-xs)' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 10 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--red)' }}>PROBLEMAS DE GRANDE IMPORTÂNCIA</div>
+        <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--accent)', letterSpacing: '0.12em', fontFamily: 'var(--font-mono)' }}>PROBLEMAS DE GRANDE IMPORTÂNCIA</div>
         <button
           onClick={() => onNavigate('tools', null, 'hierarquizacao')}
           style={{ background: 'none', border: 'none', color: 'var(--red)', fontSize: 11, cursor: 'pointer', textDecoration: 'underline', padding: 0, marginLeft: 'auto', fontFamily: 'var(--font)' }}
@@ -37,7 +37,7 @@ const PriorityProblemsPanel = ({ projectData, onNavigate }) => {
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {grandes.map(p => (
-            <span key={p.id} style={{ fontSize: 12.5, fontWeight: 600, padding: '5px 12px', borderRadius: 999, background: 'var(--bg-elevated)', color: 'var(--red)', border: '1px solid var(--red)' }}>
+            <span key={p.id} style={{ fontSize: 11.5, fontWeight: 600, padding: '5px 11px', borderRadius: 'var(--radius-xs)', background: 'var(--bg-elevated)', color: 'var(--accent)', border: '1px solid var(--accent)' }}>
               {p.label}
             </span>
           ))}
@@ -95,21 +95,23 @@ const StepView = ({ step, projectData, onSave, onNavigate, projectId }) => {
   return (
     <div data-step-view style={{ padding: '32px 40px 80px', maxWidth: 820, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+      <div style={{ borderTop: '3px solid var(--text-primary)', paddingTop: 18, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <Badge label={step.phase === 'analise' ? 'Análise' : step.phase === 'sintese' ? 'Síntese' : 'Avaliação'} color={step.color} />
-        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>Etapa {step.id}/25</span>
-        {completed && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'var(--green-light)', color: 'var(--green)', fontWeight: 600 }}>✓ Concluída</span>}
+        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>ETAPA {String(step.id).padStart(2, '0')} / 25</span>
+        {completed && <span style={{ fontSize: 9.5, padding: '3px 9px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--green)', color: 'var(--green)', fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }}>✓ CONCLUÍDA</span>}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 6 }}>
-        <span style={{ fontSize: 32, color: `var(--${step.color})` }}>{step.icon}</span>
-        <h1 style={{ fontSize: 26, fontWeight: 700 }}>{step.title}</h1>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 6 }}>
+        <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.04em', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
+          {String(step.id).padStart(2, '0')}
+        </span>
+        <h1 style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.035em' }}>{step.title}</h1>
       </div>
       <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 28, lineHeight: 1.6 }}>{step.subtitle}</p>
 
       {/* Tips */}
       {step.tips.length > 0 && (
-        <Card style={{ marginBottom: 24, padding: 18, background: step.phase === 'analise' ? 'var(--accent-light)' : step.phase === 'sintese' ? 'var(--blue-light)' : 'var(--yellow-light)', border: 'none' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: `var(--${step.color})`, marginBottom: 8 }}>DICAS</div>
+        <Card style={{ marginBottom: 24, padding: 18, background: 'var(--bg-subtle)', border: 'none', borderLeft: `3px solid var(--${step.color})`, borderRadius: 'var(--radius-xs)' }}>
+          <div style={{ fontSize: 10, fontWeight: 600, color: `var(--${step.color})`, marginBottom: 8, letterSpacing: '0.14em', fontFamily: 'var(--font-mono)' }}>DICAS</div>
           {step.tips.map((t, i) => (
             <div key={i} style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, display: 'flex', gap: 8, marginBottom: 4 }}>
               <span style={{ color: `var(--${step.color})` }}>•</span> {t}
@@ -142,13 +144,13 @@ const StepView = ({ step, projectData, onSave, onNavigate, projectId }) => {
 
       {/* Tool shortcut */}
       {step.hasTool && (
-        <Card style={{ marginBottom: 24, padding: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, borderLeft: '3px solid var(--accent)' }} onClick={() => onNavigate('tools', null, step.hasTool)}>
-          <span style={{ fontSize: 20 }}>⚙</span>
+        <Card style={{ marginBottom: 24, padding: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14, borderLeft: '3px solid var(--accent)' }} onClick={() => onNavigate('tools', null, step.hasTool)}>
+          <span style={{ color: 'var(--accent)', display: 'flex' }}><Icon name="compass" size={19} /></span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 600 }}>Abrir Ferramenta</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Use a ferramenta específica para esta etapa</div>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>Abrir ferramenta</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Use a ferramenta específica desta etapa</div>
           </div>
-          <span style={{ marginLeft: 'auto', color: 'var(--text-muted)' }}>→</span>
+          <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', display: 'flex' }}><Icon name="arrowRight" size={16} /></span>
         </Card>
       )}
 

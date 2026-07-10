@@ -205,7 +205,7 @@ const FluxogramaTool = ({ data, onSave }) => {
 
       // Rótulo
       if (conn.label) {
-        ctx.font = '500 11px "Inter", sans-serif';
+        ctx.font = '500 11px "Archivo", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#FAF9F7';
         const tw = ctx.measureText(conn.label).width + 10;
@@ -253,7 +253,7 @@ const FluxogramaTool = ({ data, onSave }) => {
       ctx.fillStyle = nt.bg;
       ctx.fill();
 
-      ctx.font = `600 ${r > 36 ? 12 : 10}px "Inter", sans-serif`;
+      ctx.font = `600 ${r > 36 ? 12 : 10}px "Archivo", sans-serif`;
       ctx.fillStyle = nt.color;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -265,7 +265,7 @@ const FluxogramaTool = ({ data, onSave }) => {
         ctx.fillText(node.name, node.x, node.y);
       }
 
-      ctx.font = '500 9px "Inter", sans-serif';
+      ctx.font = '500 9px "Archivo", sans-serif';
       ctx.fillStyle = '#9C988E';
       ctx.fillText(nt.label, node.x, node.y + r + 14);
     });

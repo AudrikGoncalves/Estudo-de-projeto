@@ -156,7 +156,7 @@ const DiagramaSetoresTool = ({ data, onSave }) => {
     const refR = getRadius(10);
     ctx.strokeStyle = '#D4D1CA'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(canvas.width - 50, canvas.height - 40, refR, 0, Math.PI * 2); ctx.stroke();
-    ctx.font = '400 10px "JetBrains Mono", monospace'; ctx.fillStyle = '#9C988E'; ctx.textAlign = 'center';
+    ctx.font = '400 10px "IBM Plex Mono", monospace'; ctx.fillStyle = '#9C988E'; ctx.textAlign = 'center';
     ctx.fillText('10m²', canvas.width - 50, canvas.height - 40 + refR + 14);
     ctx.fillText('Ref.', canvas.width - 50, canvas.height - 40 + 3);
 
@@ -179,7 +179,7 @@ const DiagramaSetoresTool = ({ data, onSave }) => {
         ctx.strokeStyle = pt.color; ctx.lineWidth = 2.5; ctx.stroke();
       }
 
-      ctx.font = '500 10px "Inter", sans-serif'; ctx.fillStyle = '#FAF9F7';
+      ctx.font = '500 10px "Archivo", sans-serif'; ctx.fillStyle = '#FAF9F7';
       const tw = ctx.measureText(pt.label).width + 8;
       ctx.fillRect(mx - tw/2, my - 16, tw, 14);
       ctx.fillStyle = pt.color; ctx.textAlign = 'center';
@@ -211,7 +211,7 @@ const DiagramaSetoresTool = ({ data, onSave }) => {
       ctx.fillStyle = grad; ctx.fill();
 
       if (showLabels) {
-        ctx.font = `600 ${r > 40 ? 13 : r > 25 ? 11 : 9}px "Inter", sans-serif`;
+        ctx.font = `600 ${r > 40 ? 13 : r > 25 ? 11 : 9}px "Archivo", sans-serif`;
         ctx.fillStyle = c.text; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         const words = b.name.split(' ');
         if (words.length > 1 && r > 35) {
@@ -223,7 +223,7 @@ const DiagramaSetoresTool = ({ data, onSave }) => {
       }
 
       if (showAreas && b.area) {
-        ctx.font = `400 ${r > 30 ? 10 : 8}px "JetBrains Mono", monospace`;
+        ctx.font = `400 ${r > 30 ? 10 : 8}px "IBM Plex Mono", monospace`;
         ctx.fillStyle = c.stroke; ctx.globalAlpha = 0.7;
         ctx.fillText(`${b.area}m²`, b.x, b.y + (showLabels && r > 35 ? 18 : r > 25 ? 10 : 6));
         ctx.globalAlpha = 1;

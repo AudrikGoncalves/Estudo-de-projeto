@@ -27,6 +27,42 @@ const saveProject = (id, data) => {
   localStorage.setItem(`mp_proj_${id}`, JSON.stringify(data));
 };
 
+// ─── Ícones de linha (substituem os emojis) ───
+const ICON_PATHS = {
+  folder: <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" />,
+  save: <><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" /><path d="M17 21v-8H7v8M7 3v5h8" /></>,
+  file: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" /></>,
+  diamond: <path d="M12 2l9 10-9 10-9-10 9-10z" />,
+  user: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
+  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></>,
+  moon: <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />,
+  plus: <path d="M12 5v14M5 12h14" />,
+  x: <path d="M18 6L6 18M6 6l12 12" />,
+  arrowRight: <path d="M5 12h14M13 6l6 6-6 6" />,
+  arrowLeft: <path d="M19 12H5M11 18l-6-6 6-6" />,
+  alert: <><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><path d="M12 9v4M12 17h.01" /></>,
+  check: <path d="M20 6L9 17l-5-5" />,
+  download: <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />,
+  upload: <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />,
+  image: <><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="M21 15l-5-5L5 21" /></>,
+  compass: <><circle cx="12" cy="12" r="10" /><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" /></>,
+  grid: <><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></>,
+  menu: <path d="M3 6h18M3 12h18M3 18h18" />,
+  clock: <><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></>,
+};
+
+const Icon = ({ name, size = 16, strokeWidth = 1.6, style }) => (
+  <svg
+    width={size} height={size} viewBox="0 0 24 24"
+    fill="none" stroke="currentColor" strokeWidth={strokeWidth}
+    strokeLinecap="round" strokeLinejoin="round"
+    style={{ flexShrink: 0, display: 'block', ...style }}
+    aria-hidden="true"
+  >
+    {ICON_PATHS[name] || null}
+  </svg>
+);
+
 // ─── Sidebar ───
 const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, currentStep, mobileOpen, onCloseMobile }) => {
   const [expanded, setExpanded] = React.useState({ analise: true, sintese: false, avaliacao: false });
@@ -49,10 +85,9 @@ const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, current
       />
     <div data-sidebar data-mobile-open={mobileOpen ? 'true' : 'false'} style={sidebarStyles.root}>
       <div style={sidebarStyles.logo}>
-        <div style={sidebarStyles.logoIcon}>MP</div>
         <div style={{ flex: 1 }}>
-          <div style={sidebarStyles.logoTitle}>Metodologia</div>
-          <div style={sidebarStyles.logoSub}>de Projeto</div>
+          <div style={sidebarStyles.logoTitle}>Metodologia<br/>de Projeto<span style={{ color: 'var(--accent)' }}>.</span></div>
+          <div style={sidebarStyles.logoSub}>ANÁLISE — SÍNTESE — AVALIAÇÃO</div>
         </div>
         <button
           onClick={onCloseMobile}
@@ -93,7 +128,7 @@ const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, current
             {PHASES.map(phase => (
               <div key={phase.id}>
                 <div style={sidebarStyles.phaseHeader} onClick={() => toggle(phase.id)}>
-                  <span style={{ fontSize: 11, color: `var(--${phase.color})`, fontWeight: 700, letterSpacing: '0.05em' }}>
+                  <span style={{ fontSize: 10, color: `var(--${phase.color})`, fontWeight: 600, letterSpacing: '0.12em', fontFamily: 'var(--font-mono)' }}>
                     {phase.label.toUpperCase()}
                   </span>
                   <span style={{ fontSize: 10, color: 'var(--text-muted)', transform: expanded[phase.id] ? 'rotate(90deg)' : 'none', transition: 'var(--transition)' }}>▶</span>
@@ -108,8 +143,8 @@ const Sidebar = ({ currentView, onNavigate, projectName, completedSteps, current
                       return (
                         <div key={sId} style={{ ...sidebarStyles.stepItem, ...(active ? sidebarStyles.stepActive : {}), ...(done ? { opacity: 0.7 } : {}) }}
                           onClick={() => handleNavClick('step', sId)}>
-                          <span style={{ ...sidebarStyles.stepDot, background: done ? `var(--${s.color})` : 'var(--border)', color: done ? '#fff' : 'var(--text-muted)', fontSize: done ? 9 : 10 }}>
-                            {done ? '✓' : sId}
+                          <span style={{ ...sidebarStyles.stepDot, background: done ? 'var(--text-primary)' : 'transparent', border: done ? '1px solid var(--text-primary)' : '1px solid var(--border-strong)', color: done ? 'var(--bg)' : 'var(--text-muted)', fontSize: done ? 9 : 9.5 }}>
+                            {done ? '✓' : String(sId).padStart(2, '0')}
                           </span>
                           <span style={{ fontSize: 13, color: active ? 'var(--text-primary)' : 'var(--text-secondary)' }}>{s.title}</span>
                         </div>
@@ -135,25 +170,24 @@ const SidebarItem = ({ icon, label, active, onClick }) => (
 );
 
 const sidebarStyles = {
-  root: { width: 272, minWidth: 272, height: '100vh', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-  logo: { display: 'flex', alignItems: 'center', gap: 12, padding: '22px 20px 16px' },
-  logoIcon: { width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, oklch(0.62 0.17 30), oklch(0.5 0.16 25))', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, letterSpacing: 1, boxShadow: 'var(--shadow-accent)' },
-  logoTitle: { fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2, letterSpacing: '-0.02em' },
-  logoSub: { fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.2, letterSpacing: '-0.005em' },
-  projectBadge: { margin: '6px 16px 10px', padding: '12px 14px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: 3, cursor: 'pointer', transition: 'var(--transition)', boxShadow: 'var(--shadow-xs)' },
+  root: { width: 272, minWidth: 272, height: '100vh', background: 'var(--bg-sidebar)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+  logo: { display: 'flex', alignItems: 'flex-start', gap: 12, padding: '24px 20px 16px', borderBottom: '1px solid var(--border)' },
+  logoTitle: { fontSize: 17, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1, letterSpacing: '-0.03em' },
+  logoSub: { fontSize: 9, color: 'var(--text-muted)', lineHeight: 1.2, letterSpacing: '0.12em', fontFamily: 'var(--font-mono)', marginTop: 8 },
+  projectBadge: { margin: '14px 16px 10px', padding: '11px 13px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 3, cursor: 'pointer', transition: 'var(--transition)' },
   progressWrap: { padding: '8px 20px 14px' },
-  progressTrack: { height: 5, background: 'var(--border)', borderRadius: 99, overflow: 'hidden' },
-  progressBar: { height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--accent-dark))', borderRadius: 99, transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)' },
+  progressTrack: { height: 3, background: 'var(--border)', overflow: 'hidden' },
+  progressBar: { height: '100%', background: 'var(--text-primary)', transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)' },
   nav: { flex: 1, overflowY: 'auto', padding: '4px 12px 24px' },
   item: { display: 'flex', alignItems: 'center', gap: 11, padding: '10px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', transition: 'var(--transition)', color: 'var(--text-secondary)' },
-  itemActive: { background: 'var(--bg-elevated)', color: 'var(--text-primary)', boxShadow: 'var(--shadow-sm)' },
-  divider: { height: 1, background: 'var(--border-light)', margin: '12px 4px' },
-  sectionLabel: { fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.1em', padding: '10px 12px 6px', textTransform: 'uppercase' },
+  itemActive: { background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)' },
+  divider: { height: 1, background: 'var(--border)', margin: '12px 4px' },
+  sectionLabel: { fontSize: 9.5, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.14em', padding: '10px 12px 6px', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' },
   phaseHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px 6px', cursor: 'pointer', borderRadius: 'var(--radius-xs)' },
   groupLabel: { fontSize: 11, color: 'var(--text-muted)', padding: '6px 12px 4px', fontWeight: 500, letterSpacing: '-0.005em' },
   stepItem: { display: 'flex', alignItems: 'center', gap: 10, padding: '7px 12px', borderRadius: 'var(--radius-xs)', cursor: 'pointer', transition: 'var(--transition)' },
   stepActive: { background: 'var(--bg-elevated)', boxShadow: 'var(--shadow-sm)' },
-  stepDot: { width: 22, height: 22, minWidth: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 10, transition: 'var(--transition)' },
+  stepDot: { width: 22, height: 22, minWidth: 22, borderRadius: 'var(--radius-xs)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500, fontSize: 10, transition: 'var(--transition)', fontFamily: 'var(--font-mono)' },
 };
 
 // ─── Cards ───
@@ -164,11 +198,10 @@ const Card = ({ children, style, onClick, interactive }) => {
       data-premium-card={isInteractive ? 'true' : undefined}
       style={{
         background: 'var(--bg-card)',
-        border: '1px solid var(--border-light)',
+        border: '1px solid var(--border)',
         borderRadius: 'var(--radius-lg)',
         padding: 26,
-        boxShadow: 'var(--shadow-sm)',
-        ...(isInteractive ? { cursor: 'pointer', transition: 'transform var(--transition), box-shadow var(--transition), border-color var(--transition)' } : {}),
+        ...(isInteractive ? { cursor: 'pointer' } : {}),
         ...style,
       }}
       onClick={onClick}
@@ -182,12 +215,15 @@ const Badge = ({ label, color = 'accent' }) => (
   <span style={{
     display: 'inline-flex',
     alignItems: 'center',
-    fontSize: 11,
+    fontSize: 9.5,
     fontWeight: 600,
-    letterSpacing: '0.02em',
-    padding: '4px 11px',
-    borderRadius: 999,
-    background: `var(--${color}-light)`,
+    letterSpacing: '0.12em',
+    textTransform: 'uppercase',
+    fontFamily: 'var(--font-mono)',
+    padding: '4px 10px',
+    borderRadius: 'var(--radius-xs)',
+    border: `1px solid var(--${color})`,
+    background: 'transparent',
     color: `var(--${color})`,
     lineHeight: 1.3,
   }}>
@@ -217,11 +253,11 @@ const Button = ({ children, onClick, variant = 'primary', style, disabled, size 
     ...sizes[size],
   };
   const variants = {
-    primary: { background: 'var(--accent)', color: '#fff', boxShadow: 'var(--shadow-accent)' },
-    secondary: { background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' },
+    primary: { background: 'var(--text-primary)', color: 'var(--bg)' },
+    secondary: { background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-strong)' },
     ghost: { background: 'transparent', color: 'var(--text-secondary)' },
-    danger: { background: 'var(--red-light)', color: 'var(--red)' },
-    outline: { background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border)' },
+    danger: { background: 'var(--accent)', color: '#fff' },
+    outline: { background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--border-strong)' },
   };
   return (
     <button
@@ -429,6 +465,7 @@ window.Badge = Badge;
 window.Button = Button;
 window.TextArea = TextArea;
 window.Input = Input;
+window.Icon = Icon;
 window.ConfirmDialog = ConfirmDialog;
 window.PromptDialog = PromptDialog;
 window.useCanvasHistory = useCanvasHistory;

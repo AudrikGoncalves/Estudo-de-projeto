@@ -93,7 +93,7 @@ const StepView = ({ step, projectData, onSave, onNavigate, projectId }) => {
   const next = step.id < 25 ? STEPS_DATA.find(s => s.id === step.id + 1) : null;
 
   return (
-    <div data-step-view style={{ padding: '32px 40px 80px', maxWidth: 820, animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
+    <div data-step-view style={{ padding: '32px 48px 80px', width: '100%', animation: 'fadeIn 0.25s ease', overflowY: 'auto', height: '100%' }}>
       {/* Header */}
       <div style={{ borderTop: '3px solid var(--text-primary)', paddingTop: 18, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <Badge label={step.phase === 'analise' ? 'Análise' : step.phase === 'sintese' ? 'Síntese' : 'Avaliação'} color={step.color} />
@@ -123,8 +123,8 @@ const StepView = ({ step, projectData, onSave, onNavigate, projectId }) => {
       {/* Problemas priorizados — só nas etapas de Síntese/Avaliação (após a Hierarquização) */}
       {step.id > 16 && <PriorityProblemsPanel projectData={projectData} onNavigate={onNavigate} />}
 
-      {/* Fields */}
-      <div style={{ display: 'grid', gap: 20, marginBottom: 28 }}>
+      {/* Fields — distribuem-se em colunas quando há espaço */}
+      <div style={{ display: 'grid', gap: 20, marginBottom: 28, gridTemplateColumns: 'repeat(auto-fit, minmax(min(380px, 100%), 1fr))' }}>
         {step.fields.map((f, i) => (
           <div key={i}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6 }}>{f}</label>

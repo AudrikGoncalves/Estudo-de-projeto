@@ -40,9 +40,8 @@ const HomeView = ({ projects, onCreateProject, onSelectProject, onDeleteProject,
     <div
       data-home-view
       style={{
-        padding: '56px 48px 64px',
-        maxWidth: 980,
-        margin: '0 auto',
+        padding: '56px 64px 64px',
+        width: '100%',
         animation: 'fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         height: '100%',
         overflowY: 'auto',
@@ -473,8 +472,7 @@ const DashboardView = ({ projectData, projectName, onNavigate }) => {
       data-dashboard-view
       style={{
         padding: '40px 48px 56px',
-        maxWidth: 1040,
-        margin: '0 auto',
+        width: '100%',
         animation: 'fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         overflowY: 'auto',
         height: '100%',
